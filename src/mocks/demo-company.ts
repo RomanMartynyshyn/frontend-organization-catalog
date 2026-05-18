@@ -6,6 +6,7 @@ export const DEMO_COMPANY: Company = {
   edrpou: '12345678',
   shortDescription:
     'Демонстраційний запис організації для каркасу каталогу. Пізніше дані підставлятимуться з API.',
+  rating: 4.3,
 };
 
 /** Єдине джерело списку для головної та lookup по slug. */

@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { RatingStarsDisplay } from '@/components/ui/RatingStars';
 
 type CompanyListCardProps = {
   company: Company;
@@ -23,6 +24,11 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
         <CardHeader>
           <CardTitle className="text-lg">{company.name}</CardTitle>
           <CardDescription>ЄДРПОУ: {company.edrpou}</CardDescription>
+          <RatingStarsDisplay
+            value={company.rating}
+            fractional
+            ariaLabel={`Рейтинг ${company.rating} з 5`}
+          />
         </CardHeader>
         <CardContent>
           <p className="text-muted line-clamp-3 text-sm leading-relaxed">

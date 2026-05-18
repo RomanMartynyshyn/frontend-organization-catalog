@@ -4,6 +4,7 @@ import { getCompanyBySlug } from '@/lib/companies/getCompanyBySlug';
 import { routes } from '@/config/routes';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { RatingStarsDisplay } from '@/components/ui/RatingStars';
 import { cn } from '@/lib/cn';
 
 type CompanyPageProps = {
@@ -33,6 +34,12 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
       <header className="space-y-2">
         <h1 className="text-foreground text-3xl font-bold">{company.name}</h1>
         <p className="text-muted text-sm">ЄДРПОУ: {company.edrpou}</p>
+        <RatingStarsDisplay
+          value={company.rating}
+          size="md"
+          fractional
+          ariaLabel={`Рейтинг ${company.rating} з 5`}
+        />
       </header>
       <Card>
         <CardHeader>

@@ -3,4 +3,5 @@ export type Company = {
   name: string;
   edrpou: string;
   shortDescription: string;
+  rating: number;
 };

@@ -1,0 +1,106 @@
+.starSvg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.emptyStar {
+  color: var(--border);
+}
+
+.fullStar {
+  color: #f5a623;
+}
+
+.display {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  vertical-align: middle;
+}
+
+.displayMd {
+  gap: 4px;
+}
+
+.inputWrap {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 0 0 24px;
+  justify-content: flex-start;
+}
+
+@media (min-width: 480px) {
+  .inputWrap {
+    gap: 16px;
+  }
+}
+
+@media (min-width: 720px) {
+  .inputWrap {
+    justify-content: flex-start;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+}
+
+.starCell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.starInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+}
+
+.starLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.starLabel::before,
+.starLabel::after {
+  display: none !important;
+}
+
+.starCell:has(.starInput:focus-visible) .starLabel {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.starCaption {
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--foreground);
+  max-width: 72px;
+}
+
+@media (min-width: 480px) {
+  .starCaption {
+    font-size: 12px;
+    max-width: none;
+  }
+}
