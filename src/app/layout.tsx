@@ -19,8 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uk" className={`${inter.variable} h-full`}>
-      <body className="flex min-h-full flex-col font-sans antialiased">
+    <html lang="uk" className="h-full">
+      <body
+        className={`${inter.className} flex min-h-screen flex-col antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
