@@ -9,12 +9,12 @@ export function SiteHeader() {
           href={routes.home}
           className="focus-visible:outline-ring flex items-center gap-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
         >
-          <span className="bg-primary text-primary-foreground flex h-10 w-10 items-center justify-center rounded-md text-sm font-bold">
-            К
+          <span className="text-text-[#000] flex h-10 w-10 items-center justify-center rounded-md bg-[#d9d9d9] text-sm font-bold">
+            logo
           </span>
 
           <span className="text-foreground text-base font-semibold">
-            Каталог організацій
+            Кривий Ріг
           </span>
         </Link>
 
@@ -28,7 +28,7 @@ export function SiteHeader() {
 
           <Link
             href={routes.login}
-            className="bg-primary text-primary-foreground rounded-md px-4 py-2 text-sm"
+            className="text-text-[#000] rounded-md bg-[#d9d9d9] px-4 py-2 text-sm"
           >
             Увійти
           </Link>
