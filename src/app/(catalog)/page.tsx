@@ -1,5 +1,6 @@
 import { getCompanies } from '@/lib/companies/getCompanies';
 import { CompanyListCard } from '@/components/catalog/CompanyListCard';
+import { Register } from '@/components/catalog/Register';
 
 export default async function HomePage() {
   const companies = await getCompanies();
@@ -20,6 +21,7 @@ export default async function HomePage() {
           ))}
         </ul>
       </section>
+      <Register />
     </div>
   );
 }
