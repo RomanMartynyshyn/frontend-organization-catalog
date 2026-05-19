@@ -21,14 +21,14 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           <Link
             href={routes.register}
-            className="border-border hover:bg-muted rounded-md border px-4 py-2 text-sm transition-colors"
+            className="border-border rounded-md border px-4 py-2 text-sm transition-colors hover:bg-[#000] hover:text-[#fff]"
           >
             Зареєструватися
           </Link>
 
           <Link
             href={routes.login}
-            className="text-text-[#000] rounded-md bg-[#d9d9d9] px-4 py-2 text-sm"
+            className="text-text-[#000] rounded-md bg-[#d9d9d9] px-4 py-2 text-sm hover:bg-[#000] hover:text-[#fff]"
           >
             Увійти
           </Link>
