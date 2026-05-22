@@ -1,29 +1,27 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { Providers } from '@/app/providers';
+'use client';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import '../styles/globals.css';
 
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin', 'cyrillic-ext'],
+const theme = createTheme({
+  palette: {
+    primary: { main: '#1976d2' }, // синій
+    secondary: { main: '#dc004e' }, // рожевий
+  },
 });
-
-export const metadata: Metadata = {
-  title: 'Каталог організацій',
-  description: 'Головна та профіль компанії (каркас до підключення API).',
-};
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="uk" className="h-full">
-      <body
-        className={`${inter.className} flex min-h-screen flex-col antialiased`}
-      >
-        <Providers>{children}</Providers>
+    <html lang="uk">
+      <body>
+        <ThemeProvider theme={theme}>
+          <CssBaseline /> {/* базові стилі MUI */}
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
