@@ -1,5 +1,5 @@
-import { catalogCompanies } from '@/mocks/demo-company';
+import { organizations } from '@/mocks/catalogCompanies';
 
 export async function getCompanies() {
-  return [...catalogCompanies];
+  return [...organizations];
 }
