@@ -1,0 +1,66 @@
+{
+  "header": {
+    "city": "Kryvyi Rih",
+    "register": "Register",
+    "login": "Sign in"
+  },
+
+  "footer": {
+    "about": "About project",
+    "support": "Support catalog",
+    "policy": "Data quality policy",
+    "report": "Report issue"
+  },
+
+  "hero": {
+    "title": "Lorem ipsum",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum egestas elit quis pellentesque. Sed vitae odio lacus. Cras at velit lacinia, viverra sem lacinia, ultrices ante. Proin eu mi et leo sagittis iaculis. Etiam eget condimentum est. In faucibus odio sollicitudin, lobortis enim id, ultrices augue. ",
+    "button": "Call to action"
+  },
+
+  "toolbar": {
+    "search": "Enter organization name...",
+
+    "sort": "Sort by",
+
+    "popular": "Popular",
+    "newest": "By date",
+    "reviews": "By reviews",
+    "recommended": "Recommended",
+    "alphabet": "A-Z",
+
+    "filter": "Filter",
+
+    "district": "District",
+    "rating": "Rating",
+    "openNow": "Open now",
+    "onlineBooking": "Online booking"
+  },
+
+  "categories": {
+    "all": "All",
+    "medicine": "Medicine",
+    "education": "Education",
+    "it": "IT",
+    "marketplaces": "Marketplaces"
+  },
+
+  "search": {
+    "results": "For \"{{search}}\" found {{count}} organizations"
+  },
+
+  "organizations": {
+    "empty": "No organizations found"
+  },
+
+  "company": {
+    "details": "Details",
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "blocked": "Blocked",
+      "unknown": "Unknown",
+      "inactive": "Inactive"
+    }
+  }
+}
