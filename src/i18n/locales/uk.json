@@ -1,0 +1,66 @@
+{
+  "header": {
+    "city": "Кривий Ріг",
+    "register": "Зареєструватися",
+    "login": "Увійти"
+  },
+
+  "footer": {
+    "about": "Про проєкт",
+    "support": "Підтримка каталогу",
+    "policy": "Політика якості даних",
+    "report": "Повідомити про збій"
+  },
+
+  "hero": {
+    "title": "Lorem ipsum",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum egestas elit quis pellentesque. Sed vitae odio lacus. Cras at velit lacinia, viverra sem lacinia, ultrices ante. Proin eu mi et leo sagittis iaculis. Etiam eget condimentum est. In faucibus odio sollicitudin, lobortis enim id, ultrices augue. ",
+    "button": "Call to action"
+  },
+
+  "toolbar": {
+    "search": "Введіть назву організації...",
+
+    "sort": "Сортувати за",
+
+    "popular": "Популярні",
+    "newest": "За датою",
+    "reviews": "За відгуками",
+    "recommended": "Рекомендовані",
+    "alphabet": "За алфавітом",
+
+    "filter": "Фільтр",
+
+    "district": "Район",
+    "rating": "Рейтинг",
+    "openNow": "Відкриті зараз",
+    "onlineBooking": "Онлайн-запис"
+  },
+
+  "categories": {
+    "all": "Усі",
+    "medicine": "Медицина",
+    "education": "Освіта",
+    "it": "IT",
+    "marketplaces": "Маркетплейси"
+  },
+
+  "search": {
+    "results": "За запитом \"{{search}}\" знайдено {{count}} організацій"
+  },
+
+  "organizations": {
+    "empty": "Організацій не знайдено"
+  },
+
+  "company": {
+    "details": "Детальніше",
+    "status": {
+      "active": "Активна",
+      "pending": "На перевірці",
+      "blocked": "Заблокована",
+      "unknown": "Невідомо",
+      "inactive": "Неактивна"
+    }
+  }
+}
