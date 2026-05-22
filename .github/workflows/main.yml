@@ -22,7 +22,11 @@ jobs:
     - run: npm run build # Збирає проєкт та створює папку .next/standalone
 
     # Копіюємо необхідну статику в автономну папку перед відправкою
-    - run: cp -r public .next/standalone/public && cp -r .next/static .next/standalone/.next/static
+    - run: |
+        cp -r public .next/standalone/public 
+        cp -r .next/static .next/standalone/.next/static
+        mkdir -p .next/standalone/tmp
+        touch .next/standalone/tmp/restart.txt
 
 
     - name: rsync deploy
