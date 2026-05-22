@@ -1,8 +1,8 @@
 on:
   push:
-    branches: [feature-ci]
+    branches: [production]
   pull_request:
-    branches: [feature-ci]
+    branches: [production]
 
 jobs:
   build:
