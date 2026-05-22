@@ -43,5 +43,5 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         key: ${{ secrets.REMOTE_KEY }}
         script: |
-          cd ${{ secrets.TARGET_DIR }}
+          cd ${{ secrets.REMOTE_PATH }}
           touch tmp/restart.txt 
