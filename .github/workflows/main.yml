@@ -44,6 +44,4 @@ jobs:
         key: ${{ secrets.REMOTE_KEY }}
         script: |
           cd ${{ secrets.TARGET_DIR }}
-          # На хостингу Україна управління процесами Node відбувається через їхню панель або команду supervisor/passenger
-          # Зазвичай достатньо "торкнути" файл перезапуску, який зчитує веб-сервер:
-          touch tmp/restart.txt || pkill -f "node server.js" || true
+          touch tmp/restart.txt 
