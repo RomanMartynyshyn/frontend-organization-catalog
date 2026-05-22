@@ -36,14 +36,14 @@ jobs:
         remote_path: ${{ secrets.REMOTE_PATH }}
 #       remote_key_pass: ${{ secrets.REMOTE_KEY_PASS }}
 
-    # - name: Restart Node Server
-    #   uses: appleboy/ssh-action@master
-    #   with:
-    #     host: ${{ secrets.HOST }}
-    #     username: ${{ secrets.USERNAME }}
-    #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-    #     script: |
-    #       cd ${{ secrets.TARGET_DIR }}
-    #       # На хостингу Україна управління процесами Node відбувається через їхню панель або команду supervisor/passenger
-    #       # Зазвичай достатньо "торкнути" файл перезапуску, який зчитує веб-сервер:
-    #       touch tmp/restart.txt || pkill -f "node server.js" || true
+    - name: Restart Node Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.REMOTE_KEY }}
+        script: |
+          cd ${{ secrets.TARGET_DIR }}
+          # На хостингу Україна управління процесами Node відбувається через їхню панель або команду supervisor/passenger
+          # Зазвичай достатньо "торкнути" файл перезапуску, який зчитує веб-сервер:
+          touch tmp/restart.txt || pkill -f "node server.js" || true
