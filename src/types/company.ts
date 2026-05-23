@@ -7,17 +7,15 @@ export type Company = {
   rating: number;
   category: string;
   status: CompanyStatus;
-};
-
-export type CompanyRaw = {
-  id: string | number;
-  name?: string;
-  category?: string;
-  shortDescription?: string;
-  description?: string;
-  status?: string;
-  rating?: number;
-  slug: string;
+  addresses: string[];
+  contacts: {
+    website: string;
+    phone: string;
+    email: string;
+    instagram: string;
+    facebook: string;
+    telegram: string;
+  };
 };
 
 export const statusLabels = {

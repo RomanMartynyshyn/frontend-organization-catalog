@@ -1,11 +1,8 @@
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import { getCompanyRating } from '@/lib/companies/getCompanyRating';
+import { mockReviews } from '@/mocks/mockReviews';
 import { getCompanyBySlug } from '@/lib/companies/getCompanyBySlug';
-import { routes } from '@/config/routes';
-import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RatingStarsDisplay } from '@/components/ui/RatingStars';
-import { cn } from '@/lib/cn';
+import CompanyPageClient from './CompanyPageClient';
 
 type CompanyPageProps = {
   params: Promise<{ slug: string }>;
@@ -13,44 +10,24 @@ type CompanyPageProps = {
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
   const { slug } = await params;
+
   const company = await getCompanyBySlug(slug);
+
   if (!company) {
     notFound();
   }
 
+  const { rating: avgRating } = getCompanyRating(company.slug);
+
+  const companyReviews = mockReviews.filter(
+    (review) => review.companySlug === company.slug,
+  );
+
   return (
-    <article className="space-y-8">
-      <div>
-        <Link
-          href={routes.home}
-          className={cn(
-            buttonVariants({ variant: 'ghost', size: 'sm' }),
-            'px-0',
-          )}
-        >
-          ← На головну
-        </Link>
-      </div>
-      <header className="space-y-2">
-        <h1 className="text-foreground text-3xl font-bold">{company.name}</h1>
-        <p className="text-muted text-sm">ЄДРПОУ: {company.edrpou}</p>
-        <RatingStarsDisplay
-          value={company.rating}
-          size="md"
-          fractional
-          ariaLabel={`Рейтинг ${company.rating} з 5`}
-        />
-      </header>
-      <Card>
-        <CardHeader>
-          <CardTitle>Про компанію</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted leading-relaxed">
-            {company.shortDescription}
-          </p>
-        </CardContent>
-      </Card>
-    </article>
+    <CompanyPageClient
+      company={company}
+      avgRating={avgRating}
+      companyReviews={companyReviews}
+    />
   );
 }

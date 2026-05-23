@@ -14,13 +14,12 @@
 
   "hero": {
     "title": "Lorem ipsum",
-    "description": "Text text text я те прошу запрацюй",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum egestas elit quis pellentesque. Sed vitae odio lacus. Cras at velit lacinia, viverra sem lacinia, ultrices ante. Proin eu mi et leo sagittis iaculis. Etiam eget condimentum est. In faucibus odio sollicitudin, lobortis enim id, ultrices augue.",
     "button": "Call to action"
   },
 
   "toolbar": {
     "search": "Введіть назву організації...",
-
     "sort": "Сортувати за",
 
     "popular": "Популярні",
@@ -30,7 +29,6 @@
     "alphabet": "За алфавітом",
 
     "filter": "Фільтр",
-
     "district": "Район",
     "rating": "Рейтинг",
     "openNow": "Відкриті зараз",
@@ -41,12 +39,14 @@
     "all": "Усі",
     "medicine": "Медицина",
     "education": "Освіта",
-    "it": "IT",
+    "IT": "IT",
     "marketplaces": "Маркетплейси"
   },
 
   "search": {
-    "results": "За запитом \"{{search}}\" знайдено {{count}} організацій"
+    "results_one": "За запитом \"{{search}}\" знайдена {{count}} організація",
+    "results_few": "За запитом \"{{search}}\" знайдено {{count}} організації",
+    "results_many": "За запитом \"{{search}}\" знайдено {{count}} організацій"
   },
 
   "organizations": {
@@ -61,6 +61,42 @@
       "blocked": "Заблокована",
       "unknown": "Невідомо",
       "inactive": "Неактивна"
+    },
+    "reviews_one": "{{count}} відгук",
+    "reviews_few": "{{count}} відгуки",
+    "reviews_many": "{{count}} відгуків"
+  },
+
+  "companyPage": {
+    "back": "← На головну",
+    "addReviewButton": "Залишити відгук",
+    "sections": {
+      "description": "Опис",
+      "branches": "Адреси філій",
+      "contacts": "Контакти",
+      "reviews": "Відгуки",
+      "addReview": "Додати відгук"
+    },
+
+    "rating": {
+      "label": "Рейтинг"
+    },
+
+    "contacts": {
+      "website": "Вебсайт",
+      "phone": "Телефон",
+      "email": "Email"
+    },
+
+    "review": {
+      "ratingLabel": "Рейтинг"
     }
+  },
+
+  "reviewForm": {
+    "namePlaceholder": "Ваше ім'я",
+    "textPlaceholder": "Уведіть Ваш відгук...",
+    "ratingLabel": "Оцінка",
+    "submit": "Надіслати"
   }
 }

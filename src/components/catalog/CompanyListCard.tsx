@@ -7,6 +7,8 @@ import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { RatingStarsDisplay } from '@/components/ui/RatingStars';
 import { useTranslation } from 'react-i18next';
 
+import { mockReviews } from '@/mocks/mockReviews';
+
 type CompanyListCardProps = {
   company: Company;
 };
@@ -16,17 +18,26 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
 
   const statusKey = company.status ?? 'unknown';
 
+  const companyReviews = mockReviews.filter(
+    (r) => r.companySlug === company.slug,
+  );
+
+  const reviewsCount = companyReviews.length;
+
+  const avgRating =
+    reviewsCount > 0
+      ? companyReviews.reduce((sum, r) => sum + r.rating, 0) / reviewsCount
+      : 0;
+
   return (
     <Card className="w-full transition-shadow hover:shadow-md">
       <div className="flex w-full flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        {/* AVATAR */}
         <div className="flex-shrink-0">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-300 text-base font-semibold text-gray-700">
             {company.name?.[0]}
           </div>
         </div>
 
-        {/* TEXT BLOCK */}
         <div className="flex flex-1 flex-col">
           <CardTitle className="text-lg">{company.name || '—'}</CardTitle>
 
@@ -38,10 +49,15 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
             </span>
 
             <RatingStarsDisplay
-              value={company.rating ?? 0}
+              value={avgRating}
               fractional
-              ariaLabel={`Рейтинг ${company.rating ?? 0} з 5`}
+              ariaLabel={`Рейтинг ${avgRating.toFixed(1)} з 5`}
             />
+
+            <span className="text-xs text-gray-500">
+              {avgRating.toFixed(1)} (
+              {t('company.reviews', { count: reviewsCount })})
+            </span>
           </div>
 
           <CardContent className="p-0 pt-2">
@@ -51,7 +67,6 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
           </CardContent>
         </div>
 
-        {/* BUTTON */}
         <div className="mt-2 flex-shrink-0 sm:mt-0">
           <Link
             href={routes.company(company.slug)}

@@ -12,7 +12,7 @@ const categories: Category[] = [
   { id: null, key: 'all' },
   { id: 'medicine', key: 'medicine' },
   { id: 'education', key: 'education' },
-  { id: 'it', key: 'it' },
+  { id: 'IT', key: 'IT' },
   { id: 'marketplaces', key: 'marketplaces' },
 ];
 
@@ -30,7 +30,7 @@ export function CategoriesBar({
   };
 
   return (
-    <div className="flex w-full flex-wrap gap-3 py-3">
+    <div className="my-10 flex w-full flex-wrap gap-3 py-3">
       {categories.map((cat) => (
         <button
           key={cat.id ?? 'all'}
@@ -41,12 +41,10 @@ export function CategoriesBar({
               : 'text-black hover:bg-black hover:text-white'
           }`}
         >
-          {/* CIRCLE */}
           <div
             className={`h-10 w-10 flex-shrink-0 rounded-full border border-black sm:h-12 sm:w-12 lg:h-16 lg:w-16 ${active === cat.id ? 'bg-white' : 'bg-gray-100'} `}
           />
 
-          {/* TEXT */}
           <span className="min-w-0 flex-1 text-center leading-tight break-words whitespace-normal">
             {t(`categories.${cat.key}`)}
           </span>
