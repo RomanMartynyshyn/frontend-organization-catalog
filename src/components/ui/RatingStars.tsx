@@ -4,7 +4,7 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import styles from './RatingStars.module.css';
 
-export type StarSize = 'sm' | 'md';
+export type StarSize = 'sm' | 'md' | 'lg';
 
 const STARS_ORDER = [1, 2, 3, 4, 5] as const;
 
@@ -19,9 +19,18 @@ const DEFAULT_CAPTIONS: Record<(typeof STARS_ORDER)[number], string> = {
 const STAR_DIMS: Record<StarSize, { w: number; h: number }> = {
   sm: { w: 18, h: 17 },
   md: { w: 25, h: 24 },
+  lg: { w: 34, h: 33 },
 };
 
-function StarIcon({ fillRatio, size }: { fillRatio: number; size: StarSize }) {
+function StarIcon({
+  fillRatio,
+  size,
+  emptyClassName,
+}: {
+  fillRatio: number;
+  size: StarSize;
+  emptyClassName?: string;
+}) {
   const { w, h } = STAR_DIMS[size];
   const safeRatio = Math.min(1, Math.max(0, fillRatio));
   const needsClipPath = safeRatio < 1;
@@ -36,7 +45,10 @@ function StarIcon({ fillRatio, size }: { fillRatio: number; size: StarSize }) {
       fill="none"
       aria-hidden
     >
-      <use href="/icons.svg#star-empty-icon" className={styles.emptyStar} />
+      <use
+        href="/icons.svg#star-empty-icon"
+        className={clsx(styles.emptyStar, emptyClassName)}
+      />
       <use
         href="/icons.svg#star-full-icon"
         className={styles.fullStar}
@@ -126,7 +138,11 @@ export function RatingStarsInput({
 
   return (
     <div
-      className={clsx(styles.inputWrap, className)}
+      className={clsx(
+        showCaptions ? styles.inputWrap : styles.display,
+        !showCaptions && styles.displayMd,
+        className,
+      )}
       onMouseLeave={() => setHoverValue(null)}
     >
       {STARS_ORDER.map((starValue) => {
@@ -150,7 +166,11 @@ export function RatingStarsInput({
               className={styles.starLabel}
               onMouseEnter={() => setHoverValue(starValue)}
             >
-              <StarIcon fillRatio={filled ? 1 : 0} size="md" />
+              <StarIcon
+                fillRatio={filled ? 1 : 0}
+                size={showCaptions ? 'md' : 'lg'}
+                emptyClassName={styles.emptyStarInput}
+              />
               {showCaptions ? (
                 <span className={styles.starCaption}>{cap[starValue]}</span>
               ) : null}

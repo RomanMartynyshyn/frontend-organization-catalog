@@ -7,6 +7,10 @@
   color: var(--border);
 }
 
+.emptyStarInput {
+  color: #8a939e;
+}
+
 .fullStar {
   color: #f5a623;
 }
