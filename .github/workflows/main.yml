@@ -1,8 +1,7 @@
 on:
   push:
     branches: [production]
-  pull_request:
-    branches: [production]
+
 
 jobs:
   build:
@@ -25,7 +24,7 @@ jobs:
     - run: |
         cp -r public .next/standalone/public 
         cp -r .next/static .next/standalone/.next/static
-        mkdir -p .next/standalone/tmp
+#        mkdir -p .next/standalone/tmp
 #        touch .next/standalone/tmp/restart.txt
 
 
@@ -47,7 +46,4 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         key: ${{ secrets.REMOTE_KEY }}
         script: |
-          sleep 5 
-          touch ${{ secrets.REMOTE_PATH }}/tmp/restart.txt 
-          echo "Node server restarted at $(date)"
-          ls -la ${{ secrets.REMOTE_PATH }}/tmp/restart.txt
+          kill $(ps aux | grep 'npm run start' | grep -v grep | awk '{print $2}')
