@@ -26,7 +26,7 @@ jobs:
         cp -r public .next/standalone/public 
         cp -r .next/static .next/standalone/.next/static
         mkdir -p .next/standalone/tmp
-        touch .next/standalone/tmp/restart.txt
+#        touch .next/standalone/tmp/restart.txt
 
 
     - name: rsync deploy
@@ -47,5 +47,7 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         key: ${{ secrets.REMOTE_KEY }}
         script: |
-          cd ${{ secrets.REMOTE_PATH }}
-          touch tmp/restart.txt 
+          sleep 5 
+          touch ${{ secrets.REMOTE_PATH }}/tmp/restart.txt 
+          echo "Node server restarted at $(date)"
+          ls -la ${{ secrets.REMOTE_PATH }}/tmp/restart.txt
