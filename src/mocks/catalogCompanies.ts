@@ -1,0 +1,87 @@
+import type { Company } from '@/types/company';
+
+export const organizations: Company[] = [
+  {
+    id: 1,
+    slug: 'demo',
+    name: 'ТОВ «Приклад Інновації»',
+    edrpou: '12345678',
+    shortDescription: 'Демонстраційний запис організації для каркасу каталогу.',
+    rating: 4.3,
+    category: 'IT',
+    status: 'active',
+    addresses: [
+      'вул. Інновацій, 27/1',
+      'вул. Степана Бандери, 2/12',
+      'вул. Івана Мазепи, 33/2',
+    ],
+    contacts: {
+      website: 'www.company.com',
+      phone: '+38 052 367 42 15',
+      email: 'emailcompany@gmail.com',
+      instagram: 'https://instagram.com/company',
+      facebook: 'https://facebook.com/company',
+      telegram: 'https://t.me/company',
+    },
+  },
+
+  {
+    id: 2,
+    slug: 'it-academy',
+    name: 'IT Academy',
+    edrpou: '12345678',
+    shortDescription: 'IT education center',
+    rating: 4.5,
+    category: 'IT',
+    status: 'blocked',
+    addresses: ['вул. Січових стрільців, 75/11'],
+    contacts: {
+      website: 'www.it-academy.ua',
+      phone: '+38 050 111 22 33',
+      email: 'itacademy@gmail.com',
+      instagram: 'https://instagram.com/itacademy',
+      facebook: 'https://facebook.com/itacademy',
+      telegram: 'https://t.me/itacademy',
+    },
+  },
+
+  {
+    id: 3,
+    slug: 'medical-center',
+    name: 'Medical Center',
+    edrpou: '87654321',
+    shortDescription: 'Medical services',
+    rating: 4.2,
+    category: 'medicine',
+    status: 'inactive',
+    addresses: ['вул. Ярослава Мудрого, 65/8', 'вул. Панаса Мирного, 3/7'],
+    contacts: {
+      website: 'www.medcenter.ua',
+      phone: '+38 067 222 44 55',
+      email: 'info@medcenter.ua',
+      instagram: 'https://instagram.com/medcenter',
+      facebook: 'https://facebook.com/medcenter',
+      telegram: 'https://t.me/medcenter',
+    },
+  },
+
+  {
+    id: 4,
+    slug: 'edu-house',
+    name: 'Edu House',
+    edrpou: '11223344',
+    shortDescription: 'Education platform',
+    rating: 4.8,
+    category: 'education',
+    status: 'pending',
+    addresses: ['вул. Революції, 5/5'],
+    contacts: {
+      website: 'www.edu-house.com',
+      phone: '+38 093 888 77 66',
+      email: 'support@edu-house.com',
+      instagram: 'https://instagram.com/eduhouse',
+      facebook: 'https://facebook.com/eduhouse',
+      telegram: 'https://t.me/eduhouse',
+    },
+  },
+];

@@ -1,7 +1,13 @@
+'use client';
+
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
+
 import { routes } from '@/config/routes';
 
 export function SiteFooter() {
+  const { t } = useTranslation();
+
   return (
     <footer className="border-border mt-auto border-t bg-black text-white">
       <div className="mx-auto max-w-6xl px-4 py-6">
@@ -11,20 +17,21 @@ export function SiteFooter() {
               logo
             </span>
 
-            <span className="text-foreground font-semibold text-white">
-              Кривий Ріг
-            </span>
+            <span className="font-semibold">{t('header.city')}</span>
           </Link>
 
           <nav className="flex flex-wrap justify-center gap-4 text-sm md:justify-end">
-            <Link href="/about">Про проєкт</Link>
-            <Link href="/support">Підтримка каталогу</Link>
-            <Link href="/privacy">Політика якості даних</Link>
-            <Link href="/report">Повідомити про збій</Link>
+            <Link href="/about">{t('footer.about')}</Link>
+
+            <Link href="/support">{t('footer.support')}</Link>
+
+            <Link href="/privacy">{t('footer.policy')}</Link>
+
+            <Link href="/report">{t('footer.report')}</Link>
           </nav>
         </div>
 
-        <p className="text-muted-foreground mt-6 text-center text-sm">
+        <p className="mt-6 text-center text-sm">
           © {new Date().getFullYear()} Kharkiv IT
         </p>
       </div>

@@ -16,7 +16,7 @@ export default function CompanyNotFound() {
         href={routes.home}
         className={cn(
           buttonVariants({ variant: 'primary' }),
-          'mt-6 inline-flex',
+          'mt-6 inline-flex bg-black text-white hover:bg-black/80',
         )}
       >
         На головну
