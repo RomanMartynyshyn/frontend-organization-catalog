@@ -14,7 +14,6 @@ export function SiteHeader() {
   return (
     <header className="border-border bg-card border-b shadow-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        {/* LOGO */}
         <Link href={routes.home} className="flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[#d9d9d9] text-sm font-bold">
             logo
@@ -23,7 +22,6 @@ export function SiteHeader() {
           <span className="text-base font-semibold">{t('header.city')}</span>
         </Link>
 
-        {/* DESKTOP MENU */}
         <div className="hidden items-center gap-3 md:flex">
           <Link
             href={routes.register}
@@ -42,14 +40,12 @@ export function SiteHeader() {
           <LanguageSwitcher />
         </div>
 
-        {/* MOBILE BURGER */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center justify-center md:hidden"
           aria-label="Toggle menu"
         >
           {isOpen ? (
-            // CLOSE ICON
             <svg
               className="h-6 w-6"
               viewBox="0 0 24 24"
@@ -63,7 +59,6 @@ export function SiteHeader() {
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
           ) : (
-            // BURGER ICON
             <svg
               className="h-6 w-6"
               viewBox="0 0 24 24"
@@ -81,7 +76,6 @@ export function SiteHeader() {
         </button>
       </div>
 
-      {/* MOBILE MENU */}
       {isOpen && (
         <div className="flex flex-col gap-3 border-t border-black px-4 py-4 md:hidden">
           <Link

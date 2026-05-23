@@ -13,7 +13,6 @@ export default function HomePage() {
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
-  // 🔥 FILTER LOGIC (MVP WITHOUT API)
   const filteredOrganizations = useMemo(() => {
     return organizations.filter((org) => {
       const matchesSearch = org.name
@@ -32,17 +31,10 @@ export default function HomePage() {
 
       <Toolbar search={search} onSearchChange={setSearch} />
 
-      {/* CATEGORIES */}
       <div className="mx-auto max-w-6xl px-6">
         <CategoriesBar onSelect={setCategoryId} />
       </div>
 
-      {/* DEBUG */}
-      <div className="px-6 py-4 text-sm text-gray-500">
-        Selected category: {categoryId ?? 'all'}
-      </div>
-
-      {/* RESULTS INFO */}
       <SearchResultsInfo search={search} count={filteredOrganizations.length} />
 
       <OrganizationsList data={filteredOrganizations} />

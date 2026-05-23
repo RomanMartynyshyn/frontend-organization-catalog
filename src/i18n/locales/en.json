@@ -14,7 +14,7 @@
 
   "hero": {
     "title": "Lorem ipsum",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum egestas elit quis pellentesque. Sed vitae odio lacus. Cras at velit lacinia, viverra sem lacinia, ultrices ante. Proin eu mi et leo sagittis iaculis. Etiam eget condimentum est. In faucibus odio sollicitudin, lobortis enim id, ultrices augue. ",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum egestas elit quis pellentesque. Sed vitae odio lacus. Cras at velit lacinia, viverra sem lacinia, ultrices ante. Proin eu mi et leo sagittis iaculis. Etiam eget condimentum est. In faucibus odio sollicitudin, lobortis enim id, ultrices augue.",
     "button": "Call to action"
   },
 
@@ -41,12 +41,13 @@
     "all": "All",
     "medicine": "Medicine",
     "education": "Education",
-    "it": "IT",
+    "IT": "IT",
     "marketplaces": "Marketplaces"
   },
 
   "search": {
-    "results": "For \"{{search}}\" found {{count}} organizations"
+    "results_one": "For \"{{search}}\" found {{count}} organization",
+    "results_other": "For \"{{search}}\" found {{count}} organizations"
   },
 
   "organizations": {
@@ -61,6 +62,41 @@
       "blocked": "Blocked",
       "unknown": "Unknown",
       "inactive": "Inactive"
+    },
+    "reviews_one": "{{count}} review",
+    "reviews_other": "{{count}} reviews"
+  },
+
+  "companyPage": {
+    "back": "← Back to home",
+    "addReviewButton": "Leave a review",
+    "sections": {
+      "description": "Description",
+      "branches": "Branch locations",
+      "contacts": "Contacts",
+      "reviews": "Reviews",
+      "addReview": "Add review"
+    },
+
+    "rating": {
+      "label": "Rating"
+    },
+
+    "contacts": {
+      "website": "Website",
+      "phone": "Phone",
+      "email": "Email"
+    },
+
+    "review": {
+      "ratingLabel": "Rating"
     }
+  },
+
+  "reviewForm": {
+    "namePlaceholder": "Your name",
+    "textPlaceholder": "Write your review...",
+    "ratingLabel": "Rating",
+    "submit": "Send"
   }
 }

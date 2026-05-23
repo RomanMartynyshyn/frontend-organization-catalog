@@ -17,6 +17,9 @@ export function Toolbar({ search, onSearchChange }: CatalogToolbarProps) {
         <div className="flex flex-[2] items-center rounded-full border bg-[#d9d9d9] px-4 py-3 shadow-sm">
           <input
             type="text"
+            name="search"
+            id="search"
+            autoComplete="off"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={t('toolbar.search')}
