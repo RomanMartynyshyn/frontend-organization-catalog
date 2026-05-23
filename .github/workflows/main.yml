@@ -1,0 +1,49 @@
+on:
+  push:
+    branches: [production]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - run: npm ci
+    - run: npm run build # Збирає проєкт та створює папку .next/standalone
+
+    # Копіюємо необхідну статику в автономну папку перед відправкою
+    - run: |
+        cp -r public .next/standalone/public 
+        cp -r .next/static .next/standalone/.next/static
+#        mkdir -p .next/standalone/tmp
+#        touch .next/standalone/tmp/restart.txt
+
+
+    - name: rsync deploy
+      uses: burnett01/rsync-deployments@v8
+      with:
+        switches: -avzr --delete --exclude='.git*' --exclude='.env'
+        path: .next/standalone/ 
+        remote_host: ${{ secrets.REMOTE_HOST }}
+        remote_user: ${{ secrets.REMOTE_USER }}
+        remote_key: ${{ secrets.REMOTE_KEY }}
+        remote_path: ${{ secrets.REMOTE_PATH }}
+#       remote_key_pass: ${{ secrets.REMOTE_KEY_PASS }}
+
+    - name: Restart Node Server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.REMOTE_HOST }}
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.REMOTE_KEY }}
+        script: |
+          kill $(ps aux | grep 'npm run start' | grep -v grep | awk '{print $2}')
