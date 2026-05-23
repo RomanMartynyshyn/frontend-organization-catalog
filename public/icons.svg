@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
   <symbol id="star-empty-icon" viewBox="0 0 25 24">
     <path
-      fill="currentColor"
-      d="M12.025 1.5 14.872 7.27l6.364.925-4.605 4.488 1.087 6.337-5.693-2.993-5.693 2.993 1.087-6.337-4.605-4.488 6.364-.925L12.025 1.5Zm0 2.34-1.9 3.847-4.247.617 3.073 2.995-.726 4.228 3.8-1.997 3.8 1.997-.726-4.228 3.073-2.995-4.247-.617-1.9-3.847Z"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linejoin="round"
+      stroke-linecap="round"
+      vector-effect="non-scaling-stroke"
+      d="M12.025 1.5 14.872 7.27l6.364.925-4.605 4.488 1.087 6.337-5.693-2.993-5.693 2.993 1.087-6.337-4.605-4.488 6.364-.925L12.025 1.5Z"
     />
   </symbol>
   <symbol id="star-full-icon" viewBox="0 0 25 24">

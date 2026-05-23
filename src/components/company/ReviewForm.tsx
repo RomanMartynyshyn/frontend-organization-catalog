@@ -5,26 +5,11 @@ import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
-
-const Star = ({
-  filled,
-  onClick,
-}: {
-  filled: boolean;
-  onClick: () => void;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="text-2xl text-yellow-400 transition"
-  >
-    {filled ? '★' : '☆'}
-  </button>
-);
+import { RatingStarsInput } from '@/components/ui/RatingStars';
 
 export const ReviewForm = () => {
   const { t } = useTranslation();
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState('');
 
   return (
     <div className="rounded-xl border p-4">
@@ -46,16 +31,14 @@ export const ReviewForm = () => {
           className="min-h-[100px] rounded-lg border px-3 py-2 text-sm"
         />
 
-        <div className="flex items-center justify-between">
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                filled={star <= rating}
-                onClick={() => setRating(star)}
-              />
-            ))}
-          </div>
+        <div className="flex items-center justify-between gap-4">
+          <RatingStarsInput
+            name="rating"
+            idPrefix="review-rating"
+            value={rating}
+            onChange={setRating}
+            showCaptions={false}
+          />
 
           <button
             className={cn(
