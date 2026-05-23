@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState, type ReactNode } from 'react';
+import '@/i18n/i18n';
 
 type ProvidersProps = {
   children: ReactNode;
@@ -13,7 +14,8 @@ export function Providers({ children }: ProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="flex min-h-full flex-1 flex-col">{children}</div>
+      {children}
+
       {process.env.NODE_ENV === 'development' ? (
         <ReactQueryDevtools buttonPosition="bottom-left" />
       ) : null}
