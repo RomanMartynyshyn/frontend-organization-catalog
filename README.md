@@ -1,6 +1,6 @@
 # Frontend-organization-catalog
 
-Next.js (App Router) + TypeScript + Tailwind CSS v4 + TanStack Query + Axios. Зараз у застосунку лише **головна** та **сторінка компанії** (мок до появи бекенду).
+Next.js (App Router) + TypeScript + Tailwind CSS v4 + TanStack Query + Axios. Каталог і сторінка організації підключені до Catalog API через BFF (`/api/*`) та SSR.
 
 ## Команди
 
@@ -12,8 +12,14 @@ npm run lint
 npm run format
 ```
 
-Головна — це **каталог** (список карток). Детальний профіль: [http://localhost:3000/companies/demo](http://localhost:3000/companies/demo)
+Головна — це **каталог** (список карток). Детальний профіль: [http://localhost:3000/companies/1](http://localhost:3000/companies/1)
 
 ## Змінні середовища
 
-Скопіюйте `.env.local.example` у `.env.local` і задайте `NEXT_PUBLIC_API_URL`, коли з’явиться API.
+Скопіюйте `.env.local.example` у `.env.local` і задайте `CATALOG_API_URL` (базовий URL зовнішнього Catalog API для SSR і BFF).
+
+BFF-ендпоінти (проксі до upstream):
+
+- `GET /api/categories`
+- `GET /api/organizations?category_id=`
+- `GET /api/organizations/:id`
