@@ -16,7 +16,7 @@ npm run format
 
 ## Змінні середовища
 
-Скопіюйте `.env.local.example` у `.env.local` і задайте `CATALOG_API_URL` (базовий URL зовнішнього Catalog API для SSR і BFF).
+Скопіюйте `.env.local.example` у `.env.local` і задайте `API_URL` (зовнішній API; на сервері через BFF `/api/*`, з браузера — лише на Next).
 
 BFF-ендпоінти (проксі до upstream):
 
