@@ -1,11 +1,12 @@
-import { getCatalogApiBaseUrl } from '@/lib/catalog-api/config';
 import type {
   CatalogCategory,
   CatalogOrganization,
 } from '@/types/catalog-api';
 
+const API_URL = process.env.API_URL!.replace(/\/$/, '');
+
 async function catalogFetch<T>(path: string): Promise<{ data: T; status: number }> {
-  const url = `${getCatalogApiBaseUrl()}${path}`;
+  const url = `${API_URL}${path}`;
 
   const response = await fetch(url, {
     headers: { Accept: 'application/json' },
