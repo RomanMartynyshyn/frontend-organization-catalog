@@ -19,7 +19,7 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
   const statusKey = company.status ?? 'unknown';
 
   const companyReviews = mockReviews.filter(
-    (r) => r.companySlug === company.slug,
+    (r) => r.companySlug === String(company.id),
   );
 
   const reviewsCount = companyReviews.length;
@@ -69,7 +69,7 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
 
         <div className="mt-2 flex-shrink-0 sm:mt-0">
           <Link
-            href={routes.company(company.slug)}
+            href={routes.company(company.id)}
             className="inline-flex rounded-md bg-black px-4 py-2 text-sm text-white hover:opacity-80"
           >
             {t('company.details')}

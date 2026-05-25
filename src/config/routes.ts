@@ -3,5 +3,5 @@ export const routes = {
   login: '/signin',
   register: '/signup',
 
-  company: (slug: string) => `/companies/${slug}` as const,
+  company: (id: string | number) => `/companies/${id}` as const,
 } as const;

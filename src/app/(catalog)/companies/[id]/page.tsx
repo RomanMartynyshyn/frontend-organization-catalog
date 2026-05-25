@@ -1,26 +1,27 @@
 import { notFound } from 'next/navigation';
 import { getCompanyRating } from '@/lib/companies/getCompanyRating';
 import { mockReviews } from '@/mocks/mockReviews';
-import { getCompanyBySlug } from '@/lib/companies/getCompanyBySlug';
+import { getCompanyById } from '@/lib/companies/getCompanyById';
 import CompanyPageClient from './CompanyPageClient';
 
 type CompanyPageProps = {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ id: string }>;
 };
 
 export default async function CompanyPage({ params }: CompanyPageProps) {
-  const { slug } = await params;
+  const { id } = await params;
 
-  const company = await getCompanyBySlug(slug);
+  const company = await getCompanyById(id);
 
   if (!company) {
     notFound();
   }
 
-  const { rating: avgRating } = getCompanyRating(company.slug);
+  const companyKey = String(company.id);
+  const { rating: avgRating } = getCompanyRating(companyKey);
 
   const companyReviews = mockReviews.filter(
-    (review) => review.companySlug === company.slug,
+    (review) => review.companySlug === companyKey,
   );
 
   return (
