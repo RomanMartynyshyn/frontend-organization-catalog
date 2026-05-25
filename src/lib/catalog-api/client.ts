@@ -3,7 +3,7 @@ import type {
   CatalogOrganization,
 } from '@/types/catalog-api';
 
-const API_URL = process.env.API_URL!.replace(/\/$/, '');
+const API_URL = process.env.API_URL || 'http://3458052.levelhst.web.hosting-test.net';
 
 async function catalogFetch<T>(path: string): Promise<{ data: T; status: number }> {
   const url = `${API_URL}${path}`;
