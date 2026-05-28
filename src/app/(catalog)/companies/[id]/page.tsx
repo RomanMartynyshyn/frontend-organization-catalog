@@ -1,8 +1,13 @@
+import {Metadata} from 'next';
 import { notFound } from 'next/navigation';
 import { getCompanyRating } from '@/lib/companies/getCompanyRating';
 import { mockReviews } from '@/mocks/mockReviews';
 import { getCompanyById } from '@/lib/companies/getCompanyById';
 import CompanyPageClient from './CompanyPageClient';
+
+export const metadata:Metadata = {
+  title: 'Company Details',
+};
 
 type CompanyPageProps = {
   params: Promise<{ id: string }>;

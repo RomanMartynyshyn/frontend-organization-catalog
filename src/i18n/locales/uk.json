@@ -15,7 +15,7 @@
   "hero": {
     "title": "Lorem ipsum",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce rutrum egestas elit quis pellentesque. Sed vitae odio lacus. Cras at velit lacinia, viverra sem lacinia, ultrices ante. Proin eu mi et leo sagittis iaculis. Etiam eget condimentum est. In faucibus odio sollicitudin, lobortis enim id, ultrices augue.",
-    "button": "Call to action"
+    "button": "Додати організацію"
   },
 
   "toolbar": {
@@ -65,6 +65,10 @@
     "reviews_one": "{{count}} відгук",
     "reviews_few": "{{count}} відгуки",
     "reviews_many": "{{count}} відгуків"
+  },
+
+  "add": {
+    "title": "Додати організацію до каталогу"
   },
 
   "companyPage": {

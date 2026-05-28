@@ -1,9 +1,20 @@
 import type {
   CatalogCategory,
-  CatalogOrganization,
+  CatalogOrganization, CreateOrganizationPayload,
 } from '@/types/catalog-api';
 
 const API_URL = process.env.API_URL || 'http://3458052.levelhst.web.hosting-test.net';
+
+export class CatalogApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly data?: unknown,
+  ) {
+    super(message);
+    this.name = 'CatalogApiError';
+  }
+}
 
 async function catalogFetch<T>(path: string): Promise<{ data: T; status: number }> {
   const url = `${API_URL}${path}`;
@@ -27,8 +38,49 @@ async function catalogFetch<T>(path: string): Promise<{ data: T; status: number 
   return { data, status: response.status };
 }
 
+async function catalogPost<TResponse, TBody>(
+  path: string,
+  body: TBody,
+): Promise<{ data: TResponse; status: number }> {
+  const url = `${API_URL}${path}`;
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    cache: 'no-store',
+  });
+
+  const responseText = await response.text();
+  const data = responseText ? (JSON.parse(responseText) as TResponse) : (null as TResponse);
+
+  if (!response.ok) {
+    throw new CatalogApiError(
+      `Catalog API request failed: ${response.status} ${response.statusText} (${url})`,
+      response.status,
+      data,
+    );
+  }
+
+  return { data, status: response.status };
+}
+
 export async function fetchCategories(): Promise<CatalogCategory[]> {
   const { data } = await catalogFetch<CatalogCategory[]>('/api/categories');
+  return data;
+}
+
+export async function createOrganization(
+  payload: CreateOrganizationPayload,
+): Promise<CatalogOrganization> {
+  const { data } = await catalogPost<CatalogOrganization, CreateOrganizationPayload>(
+    '/api/organizations',
+    payload,
+  );
+
   return data;
 }
 
