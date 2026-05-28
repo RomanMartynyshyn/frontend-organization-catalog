@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from 'react-i18next';
+import Link from 'next/link';
 
 export default function HeroMapSection() {
   const { t } = useTranslation();
@@ -13,9 +14,10 @@ export default function HeroMapSection() {
 
           <p className="mb-6 text-gray-600">{t('hero.description')}</p>
 
-          <button className="cursor-pointer rounded-md bg-black px-6 py-3 text-white transition hover:opacity-80">
+          <Link className="cursor-pointer rounded-md bg-black px-6 py-3 text-white transition hover:opacity-80"
+                href={"/companies/add"}>
             {t('hero.button')}
-          </button>
+          </Link>
         </div>
 
         <div className="flex flex-1 flex-col gap-4">
