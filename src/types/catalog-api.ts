@@ -22,3 +22,10 @@ export type CatalogOrganization = {
   rejectionReason: string | null;
   categories: CatalogOrganizationCategory[];
 };
+
+export type CreateOrganizationPayload = {
+  name: string;
+  description: string;
+  websiteUrl: string;
+  categoryIds: number[];
+};
