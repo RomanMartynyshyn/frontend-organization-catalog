@@ -5,9 +5,57 @@ import {
   createOrganization,
   fetchOrganizations,
 } from '@/lib/catalog-api/client';
-import type { CreateOrganizationPayload } from '@/types/catalog-api';
+import type {
+  CatalogLocationInput,
+  CreateOrganizationPayload,
+} from '@/types/catalog-api';
 
 export const dynamic = 'force-dynamic';
+
+function validateLocations(
+  locations: CatalogLocationInput[] | undefined,
+): CatalogLocationInput[] | null {
+  if (!Array.isArray(locations) || locations.length < 1) {
+    return null;
+  }
+
+  const validated: CatalogLocationInput[] = [];
+
+  for (const location of locations) {
+    const street = location.street?.trim();
+    const city = location.city?.trim();
+    const region = location.region?.trim();
+    const postCode = location.postCode?.trim();
+    const latitude = Number(location.latitude);
+    const longitude = Number(location.longitude);
+
+    if (!street || !city || !region || !postCode || postCode.length !== 5) {
+      return null;
+    }
+
+    if (
+      Number.isNaN(latitude) ||
+      Number.isNaN(longitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      return null;
+    }
+
+    validated.push({
+      street,
+      city,
+      region,
+      postCode,
+      latitude,
+      longitude,
+    });
+  }
+
+  return validated;
+}
 
 export async function GET(request: NextRequest) {
   const categoryIdParam = request.nextUrl.searchParams.get('category_id');
@@ -97,11 +145,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const locations = validateLocations(payload.locations);
+    if (!locations) {
+      return NextResponse.json(
+        {
+          errors: [
+            {
+              field: 'locations',
+              message: 'At least one complete location is required',
+            },
+          ],
+        },
+        { status: 400 },
+      );
+    }
+
     const organisation = await createOrganization({
       name,
       description,
       websiteUrl,
       categoryIds,
+      locations,
     });
 
     return NextResponse.json(organisation, { status: 201 });
