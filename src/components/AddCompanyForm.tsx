@@ -5,7 +5,14 @@ import { useState, type ComponentProps } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { fetchCategories } from '@/lib/catalog-api/client';
-import type { CatalogOrganization, CreateOrganizationPayload } from '@/types/catalog-api';
+import type {
+  ApiErrorResponse,
+  CatalogOrganization,
+  CreateOrganizationPayload,
+} from '@/types/catalog-api';
+
+const inputClassName =
+  'rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary';
 
 async function submitOrganization(
   payload: CreateOrganizationPayload,
@@ -19,9 +26,16 @@ async function submitOrganization(
     body: JSON.stringify(payload),
   });
 
-  const data = (await response.json()) as CatalogOrganization | { message?: string };
+  const data = (await response.json()) as
+    | CatalogOrganization
+    | ApiErrorResponse
+    | { message?: string };
 
   if (!response.ok) {
+    if ('errors' in data && Array.isArray(data.errors) && data.errors.length > 0) {
+      throw new Error(data.errors.map((error) => error.message).join('. '));
+    }
+
     throw new Error(
       'message' in data && typeof data.message === 'string'
         ? data.message
@@ -40,6 +54,12 @@ export default function AddCompanyForm() {
   const [description, setDescription] = useState('');
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [categoryIds, setCategoryIds] = useState<number[]>([]);
+  const [street, setStreet] = useState('');
+  const [city, setCity] = useState('');
+  const [region, setRegion] = useState('');
+  const [postCode, setPostCode] = useState('');
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
 
   const {
     data: categories = [],
@@ -57,6 +77,12 @@ export default function AddCompanyForm() {
       setDescription('');
       setWebsiteUrl('');
       setCategoryIds([]);
+      setStreet('');
+      setCity('');
+      setRegion('');
+      setPostCode('');
+      setLatitude('');
+      setLongitude('');
 
       await queryClient.invalidateQueries({ queryKey: ['organizations'] });
     },
@@ -80,13 +106,34 @@ export default function AddCompanyForm() {
       description,
       websiteUrl,
       categoryIds,
+      locations: [
+        {
+          street: street.trim(),
+          city: city.trim(),
+          region: region.trim(),
+          postCode: postCode.trim(),
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+        },
+      ],
     });
   };
+
+  const isLocationComplete =
+    street.trim() !== '' &&
+    city.trim() !== '' &&
+    region.trim() !== '' &&
+    postCode.trim().length === 5 &&
+    latitude.trim() !== '' &&
+    longitude.trim() !== '' &&
+    !Number.isNaN(Number(latitude)) &&
+    !Number.isNaN(Number(longitude));
 
   const isSubmitDisabled =
     createOrganizationMutation.isPending ||
     !name.trim() ||
-    categoryIds.length === 0;
+    categoryIds.length === 0 ||
+    !isLocationComplete;
 
   return (
   <form onSubmit={handleSubmit} className="mx-auto flex max-w-2xl flex-col gap-5">
@@ -100,7 +147,7 @@ export default function AddCompanyForm() {
         value={name}
         onChange={(event) => setName(event.target.value)}
         placeholder="Company name"
-        className="rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        className={inputClassName}
         required
       />
     </div>
@@ -114,7 +161,7 @@ export default function AddCompanyForm() {
         value={description}
         onChange={(event) => setDescription(event.target.value)}
         placeholder="Describe the organization"
-        className="min-h-32 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        className={`min-h-32 ${inputClassName}`}
       />
     </div>
 
@@ -128,9 +175,118 @@ export default function AddCompanyForm() {
         value={websiteUrl}
         onChange={(event) => setWebsiteUrl(event.target.value)}
         placeholder="https://example.com"
-        className="rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        className={inputClassName}
       />
     </div>
+
+    <fieldset className="flex flex-col gap-3">
+      <legend className="text-sm font-medium">Location</legend>
+      <p className="text-muted-foreground text-xs">
+        At least one address. Post code — 5 digits; latitude −90…90, longitude
+        −180…180.
+      </p>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="flex flex-col gap-2 sm:col-span-2">
+          <label htmlFor="location-street" className="text-sm font-medium">
+            Street
+          </label>
+          <input
+            id="location-street"
+            type="text"
+            value={street}
+            onChange={(event) => setStreet(event.target.value)}
+            placeholder="вул. Хрещатик, 1"
+            className={inputClassName}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="location-city" className="text-sm font-medium">
+            City
+          </label>
+          <input
+            id="location-city"
+            type="text"
+            value={city}
+            onChange={(event) => setCity(event.target.value)}
+            placeholder="Київ"
+            className={inputClassName}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="location-region" className="text-sm font-medium">
+            Region
+          </label>
+          <input
+            id="location-region"
+            type="text"
+            value={region}
+            onChange={(event) => setRegion(event.target.value)}
+            placeholder="Київська область"
+            className={inputClassName}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="location-post-code" className="text-sm font-medium">
+            Post code
+          </label>
+          <input
+            id="location-post-code"
+            type="text"
+            value={postCode}
+            onChange={(event) => setPostCode(event.target.value)}
+            placeholder="01001"
+            minLength={5}
+            maxLength={5}
+            pattern="\d{5}"
+            className={inputClassName}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="location-latitude" className="text-sm font-medium">
+            Latitude
+          </label>
+          <input
+            id="location-latitude"
+            type="number"
+            step="any"
+            min={-90}
+            max={90}
+            value={latitude}
+            onChange={(event) => setLatitude(event.target.value)}
+            placeholder="50.4501"
+            className={inputClassName}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="location-longitude" className="text-sm font-medium">
+            Longitude
+          </label>
+          <input
+            id="location-longitude"
+            type="number"
+            step="any"
+            min={-180}
+            max={180}
+            value={longitude}
+            onChange={(event) => setLongitude(event.target.value)}
+            placeholder="30.5234"
+            className={inputClassName}
+            required
+          />
+        </div>
+      </div>
+    </fieldset>
 
     <fieldset className="flex flex-col gap-3">
       <legend className="text-sm font-medium">Categories</legend>

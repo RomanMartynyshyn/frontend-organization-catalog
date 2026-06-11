@@ -24,17 +24,23 @@ async function catalogFetch<T>(path: string): Promise<{ data: T; status: number 
     cache: 'no-store',
   });
 
+  const responseText = await response.text();
+  const data = responseText
+    ? (JSON.parse(responseText) as T)
+    : (null as T);
+
   if (response.status === 404) {
     return { data: null as T, status: 404 };
   }
 
   if (!response.ok) {
-    throw new Error(
+    throw new CatalogApiError(
       `Catalog API request failed: ${response.status} ${response.statusText} (${url})`,
+      response.status,
+      data,
     );
   }
 
-  const data = (await response.json()) as T;
   return { data, status: response.status };
 }
 
