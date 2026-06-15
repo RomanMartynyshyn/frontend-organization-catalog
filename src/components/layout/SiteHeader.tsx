@@ -1,102 +1,59 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
+import { useCatalogSearch } from '@/contexts/CatalogSearchContext';
 import { routes } from '@/config/routes';
-import { LanguageSwitcher } from '../LanguageSwitcher';
+
+const CITY_NAME = 'Кривий Ріг';
 
 export function SiteHeader() {
-  const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const { search, setSearch } = useCatalogSearch();
 
   return (
     <header className="border-border bg-card border-b shadow-sm">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link href={routes.home} className="flex items-center gap-3">
+      <div className="mx-auto flex max-w-6xl flex-col items-stretch gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4">
+        <Link href={routes.home} className="shrink-0">
           <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[#d9d9d9] text-sm font-bold">
             logo
           </span>
-
-          <span className="text-base font-semibold">{t('header.city')}</span>
         </Link>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Link
-            href={routes.register}
-            className="rounded-md border border-black px-4 py-2 text-sm hover:bg-black hover:text-white"
-          >
-            {t('header.register')}
-          </Link>
+        <div className="flex min-w-0 flex-1 items-center gap-3 rounded-full border border-black bg-[#d9d9d9] px-4 py-2.5 shadow-sm">
+          <span className="shrink-0 text-sm font-semibold">{CITY_NAME}</span>
 
-          <Link
-            href={routes.login}
-            className="rounded-md border border-black bg-[#d9d9d9] px-4 py-2 text-sm hover:bg-black hover:text-white"
-          >
-            {t('header.login')}
-          </Link>
+          <div className="h-5 w-px shrink-0 bg-black/20" />
 
-          <LanguageSwitcher />
+          <input
+            type="text"
+            name="search"
+            id="search"
+            autoComplete="off"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Введіть свій запит"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none"
+          />
+
+          <svg
+            className="h-5 w-5 shrink-0 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
 
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-center md:hidden"
-          aria-label="Toggle menu"
+        <Link
+          href={routes.addCompany}
+          className="shrink-0 rounded-md bg-black px-4 py-2.5 text-center text-sm text-white transition hover:opacity-80 sm:shrink-0"
         >
-          {isOpen ? (
-            <svg
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          ) : (
-            <svg
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="3" y1="6" x2="21" y2="6" />
-              <line x1="3" y1="12" x2="21" y2="12" />
-              <line x1="3" y1="18" x2="21" y2="18" />
-            </svg>
-          )}
-        </button>
+          Додати організацію
+        </Link>
       </div>
-
-      {isOpen && (
-        <div className="flex flex-col gap-3 border-t border-black px-4 py-4 md:hidden">
-          <Link
-            href={routes.register}
-            className="rounded-md border border-black px-4 py-2 text-sm"
-            onClick={() => setIsOpen(false)}
-          >
-            {t('header.register')}
-          </Link>
-
-          <Link
-            href={routes.login}
-            className="rounded-md border border-black px-4 py-2 text-sm"
-            onClick={() => setIsOpen(false)}
-          >
-            {t('header.login')}
-          </Link>
-
-          <LanguageSwitcher />
-        </div>
-      )}
     </header>
   );
 }

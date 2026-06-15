@@ -10,6 +10,8 @@ export const organizations: Company[] = [
     rating: 4.3,
     category: 'IT',
     status: 'active',
+    regions: [],
+    primaryAddress: 'вул. Інновацій, 27/1',
     addresses: [
       'вул. Інновацій, 27/1',
       'вул. Степана Бандери, 2/12',
@@ -34,6 +36,8 @@ export const organizations: Company[] = [
     rating: 4.5,
     category: 'IT',
     status: 'blocked',
+    regions: [],
+    primaryAddress: 'вул. Січових стрільців, 75/11',
     addresses: ['вул. Січових стрільців, 75/11'],
     contacts: {
       website: 'www.it-academy.ua',
@@ -54,6 +58,8 @@ export const organizations: Company[] = [
     rating: 4.2,
     category: 'medicine',
     status: 'inactive',
+    regions: [],
+    primaryAddress: 'вул. Ярослава Мудрого, 65/8',
     addresses: ['вул. Ярослава Мудрого, 65/8', 'вул. Панаса Мирного, 3/7'],
     contacts: {
       website: 'www.medcenter.ua',
@@ -74,6 +80,8 @@ export const organizations: Company[] = [
     rating: 4.8,
     category: 'education',
     status: 'pending',
+    regions: [],
+    primaryAddress: 'вул. Революції, 5/5',
     addresses: ['вул. Революції, 5/5'],
     contacts: {
       website: 'www.edu-house.com',

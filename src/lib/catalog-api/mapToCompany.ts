@@ -37,6 +37,15 @@ function formatCategories(categories: CatalogOrganization['categories']): string
 export function mapOrganizationToCompany(org: CatalogOrganization): Company {
   const website = org.websiteUrl ? stripWebsiteProtocol(org.websiteUrl) : '';
   const social = org.sociaLinks ?? {};
+  const addresses = org.locations.map(formatLocation);
+  const regions = [
+    ...new Set(
+      org.locations
+        .map((location) => location.region?.trim())
+        .filter((region): region is string => Boolean(region)),
+    ),
+  ];
+  const workingHours = org.workingHours?.trim();
 
   return {
     id: org.id,
@@ -47,7 +56,10 @@ export function mapOrganizationToCompany(org: CatalogOrganization): Company {
     rating: 0,
     category: formatCategories(org.categories),
     status: mapOrganizationStatus(org.status),
-    addresses: org.locations.map(formatLocation),
+    workingHours: workingHours || undefined,
+    regions,
+    primaryAddress: addresses[0] ?? '',
+    addresses,
     contacts: {
       website,
       phone: org.contacts?.phone?.trim() ?? '',

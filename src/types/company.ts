@@ -7,6 +7,9 @@ export type Company = {
   rating: number;
   category: string;
   status: CompanyStatus;
+  workingHours?: string;
+  regions: string[];
+  primaryAddress: string;
   addresses: string[];
   contacts: {
     website: string;

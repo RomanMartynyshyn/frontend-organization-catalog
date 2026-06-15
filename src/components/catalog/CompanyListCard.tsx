@@ -1,81 +1,123 @@
 'use client';
 
 import Link from 'next/link';
-import type { Company } from '@/types/company';
-import { routes } from '@/config/routes';
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
-import { RatingStarsDisplay } from '@/components/ui/RatingStars';
-import { useTranslation } from 'react-i18next';
 
-import { mockReviews } from '@/mocks/mockReviews';
+import { routes } from '@/config/routes';
+import type { Company } from '@/types/company';
 
 type CompanyListCardProps = {
   company: Company;
 };
 
+const LocationIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-4 w-4 shrink-0 text-gray-600"
+    aria-hidden="true"
+  >
+    <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z" />
+    <circle cx="12" cy="10" r="2" />
+  </svg>
+);
+
+const ClockIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-3.5 w-3.5 shrink-0"
+    aria-hidden="true"
+  >
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 3" />
+  </svg>
+);
+
+const StoreIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-8 w-8 text-gray-700"
+    aria-hidden="true"
+  >
+    <path d="M6 7h12l-1 12H7L6 7z" />
+    <path d="M9 7V5a3 3 0 0 1 6 0v2" />
+  </svg>
+);
+
 export function CompanyListCard({ company }: CompanyListCardProps) {
-  const { t } = useTranslation();
-
-  const statusKey = company.status ?? 'unknown';
-
-  const companyReviews = mockReviews.filter(
-    (r) => r.companySlug === String(company.id),
-  );
-
-  const reviewsCount = companyReviews.length;
-
-  const avgRating =
-    reviewsCount > 0
-      ? companyReviews.reduce((sum, r) => sum + r.rating, 0) / reviewsCount
-      : 0;
+  const hasCategory = Boolean(company.category?.trim());
+  const hasAddress = Boolean(company.primaryAddress?.trim());
+  const hasWorkingHours = Boolean(company.workingHours?.trim());
+  const hasDescription = Boolean(company.shortDescription?.trim());
 
   return (
-    <Card className="w-full transition-shadow hover:shadow-md">
-      <div className="flex w-full flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        <div className="flex-shrink-0">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-300 text-base font-semibold text-gray-700">
-            {company.name?.[0]}
-          </div>
-        </div>
-
-        <div className="flex flex-1 flex-col">
-          <CardTitle className="text-lg">{company.name || '—'}</CardTitle>
-
-          <div className="text-muted-foreground mt-1 flex flex-wrap items-center gap-3 text-sm">
-            <span>{company.category ?? 'Категорія'}</span>
-
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs">
-              {t(`company.status.${statusKey}`)}
-            </span>
-
-            <RatingStarsDisplay
-              value={avgRating}
-              fractional
-              ariaLabel={`Рейтинг ${avgRating.toFixed(1)} з 5`}
-            />
-
-            <span className="text-xs text-gray-500">
-              {avgRating.toFixed(1)} (
-              {t('company.reviews', { count: reviewsCount })})
-            </span>
+    <article className="rounded-2xl bg-[#c4c4c4] p-5">
+      <div className="flex gap-5">
+        <div className="flex w-24 shrink-0 flex-col items-center gap-2">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#d9d9d9]">
+            <StoreIcon />
           </div>
 
-          <CardContent className="p-0 pt-2">
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {company.shortDescription || 'Опис відсутній'}
+          {hasCategory && (
+            <p className="text-center text-xs leading-snug text-gray-700">
+              {company.category}
             </p>
-          </CardContent>
+          )}
         </div>
 
-        <div className="mt-2 flex-shrink-0 sm:mt-0">
-          <Link
-            href={routes.company(company.id)}
-            className="inline-flex rounded-md bg-black px-4 py-2 text-sm text-white hover:opacity-80"
-          >
-            {t('company.details')}
-          </Link>
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold leading-tight">
+              {company.name || '—'}
+            </h3>
+
+            {hasAddress && (
+              <p className="flex items-start gap-2 text-sm text-gray-700">
+                <LocationIcon />
+                <span>{company.primaryAddress}</span>
+              </p>
+            )}
+
+            {hasWorkingHours && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/50 px-3 py-1 text-xs text-gray-700">
+                <ClockIcon />
+                {company.workingHours}
+              </span>
+            )}
+          </div>
+
+          {hasDescription && (
+            <p className="text-sm leading-relaxed text-gray-600">
+              {company.shortDescription}
+            </p>
+          )}
+
+          <div className="flex justify-end pt-1">
+            <Link
+              href={routes.company(company.id)}
+              className="inline-flex rounded-md bg-black px-5 py-2 text-sm text-white transition hover:opacity-80"
+            >
+              Детальніше
+            </Link>
+          </div>
         </div>
       </div>
-    </Card>
+    </article>
   );
 }
