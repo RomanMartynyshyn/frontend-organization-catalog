@@ -21,23 +21,25 @@ export function OrganizationsList({
       )}
 
       <div
-        className="overflow-y-auto rounded-2xl border border-black/70 bg-[#d9d9d9] p-3 min-h-[280px] max-h-[min(55vh,480px)] lg:max-h-none lg:min-h-0 lg:flex-1"
+        className="flex min-h-[280px] max-h-[min(55vh,480px)] flex-col rounded-2xl bg-[#d9d9d9] px-4 py-4 lg:max-h-none lg:min-h-0 lg:flex-1"
       >
-        {isLoading ? (
-          <div className="flex h-full min-h-[200px] items-center justify-center text-gray-600">
-            Завантаження…
-          </div>
-        ) : !data.length ? (
-          <div className="flex h-full min-h-[200px] items-center justify-center text-gray-600">
-            Організацій не знайдено
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {data.map((company) => (
-              <CompanyListCard key={company.id} company={company} />
-            ))}
-          </div>
-        )}
+        <div className="min-h-0 flex-1 overflow-y-auto pr-6">
+          {isLoading ? (
+            <div className="flex min-h-[200px] items-center justify-center text-gray-600">
+              Завантаження…
+            </div>
+          ) : !data.length ? (
+            <div className="flex min-h-[200px] items-center justify-center text-gray-600">
+              Організацій не знайдено
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {data.map((company) => (
+                <CompanyListCard key={company.id} company={company} />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
