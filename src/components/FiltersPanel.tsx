@@ -41,9 +41,7 @@ export function FiltersPanel({
     <aside className="flex w-full shrink-0 flex-col lg:h-full lg:w-[240px]">
       <h2 className="mb-4 shrink-0 text-lg font-semibold">Фільтри</h2>
 
-      <div
-        className="flex min-h-0 flex-1 flex-col rounded-2xl border border-black/70 bg-[#d9d9d9] p-4"
-      >
+      <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#d9d9d9] p-4">
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="border-b border-black/20 pb-4">
             <button
