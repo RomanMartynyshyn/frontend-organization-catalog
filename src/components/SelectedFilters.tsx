@@ -17,10 +17,10 @@ export function SelectedFilters({ filters, onReset }: SelectedFiltersProps) {
   }
 
   return (
-    <div className="rounded-2xl border border-black bg-white p-4">
+    <div className="rounded-2xl border border-black/70 bg-white px-5 py-4">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-3">
-          <p className="text-sm font-medium">Обрані фільтри:</p>
+        <div className="min-w-0 space-y-3">
+          <p className="text-sm font-semibold">Обрані фільтри:</p>
 
           <div className="flex flex-wrap gap-2">
             {filters.map((filter) => (
@@ -28,10 +28,12 @@ export function SelectedFilters({ filters, onReset }: SelectedFiltersProps) {
                 key={filter.id}
                 type="button"
                 onClick={filter.onRemove}
-                className="inline-flex items-center gap-2 rounded-full border border-black px-3 py-1 text-sm transition hover:bg-gray-50"
+                className="inline-flex items-center gap-2 rounded-full border border-black/70 bg-[#d9d9d9] px-3 py-1.5 text-sm transition hover:bg-[#c8c8c8]"
               >
                 <span>{filter.label}</span>
-                <span aria-hidden="true">×</span>
+                <span className="text-base leading-none" aria-hidden="true">
+                  ×
+                </span>
               </button>
             ))}
           </div>
@@ -40,7 +42,7 @@ export function SelectedFilters({ filters, onReset }: SelectedFiltersProps) {
         <button
           type="button"
           onClick={onReset}
-          className="shrink-0 text-sm underline transition hover:opacity-70"
+          className="shrink-0 rounded-md border border-black/70 bg-white px-4 py-1.5 text-sm transition hover:bg-gray-50"
         >
           Скинути фільтри
         </button>

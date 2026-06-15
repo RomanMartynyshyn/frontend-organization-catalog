@@ -6,14 +6,12 @@ type FiltersPanelProps = {
   regions: string[];
   selectedRegions: string[];
   onSelectedRegionsChange: (regions: string[]) => void;
-  onApply: () => void;
 };
 
 export function FiltersPanel({
   regions,
   selectedRegions,
   onSelectedRegionsChange,
-  onApply,
 }: FiltersPanelProps) {
   const [isRegionOpen, setIsRegionOpen] = useState(true);
   const [pendingRegions, setPendingRegions] =
@@ -33,7 +31,6 @@ export function FiltersPanel({
 
   const handleApply = () => {
     onSelectedRegionsChange(pendingRegions);
-    onApply();
   };
 
   if (!regions.length) {
@@ -41,53 +38,57 @@ export function FiltersPanel({
   }
 
   return (
-    <aside className="w-full shrink-0 lg:w-64">
-      <h2 className="mb-4 text-lg font-semibold">Фільтри</h2>
+    <aside className="flex w-full shrink-0 flex-col lg:h-full lg:w-[240px]">
+      <h2 className="mb-4 shrink-0 text-lg font-semibold">Фільтри</h2>
 
-      <div className="space-y-4 rounded-2xl border border-black bg-white p-4">
-        <div>
-          <button
-            type="button"
-            onClick={() => setIsRegionOpen((open) => !open)}
-            className="flex w-full items-center justify-between text-sm font-medium"
-          >
-            Район
-            <svg
-              className={`h-4 w-4 transition ${isRegionOpen ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
+      <div
+        className="flex min-h-0 flex-1 flex-col rounded-2xl border border-black/70 bg-[#d9d9d9] p-4"
+      >
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="border-b border-black/20 pb-4">
+            <button
+              type="button"
+              onClick={() => setIsRegionOpen((open) => !open)}
+              className="flex w-full items-center justify-between text-sm font-semibold"
             >
-              <path d="M6 9l6 6 6-6" />
-            </svg>
-          </button>
+              Район
+              <svg
+                className={`h-4 w-4 transition ${isRegionOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
 
-          {isRegionOpen && (
-            <div className="mt-3 space-y-2">
-              {regions.map((region) => (
-                <label
-                  key={region}
-                  className="flex items-center gap-2 text-sm"
-                >
-                  <input
-                    type="checkbox"
-                    checked={pendingRegions.includes(region)}
-                    onChange={() => toggleRegion(region)}
-                    className="h-4 w-4 rounded border-black"
-                  />
-                  <span>{region}</span>
-                </label>
-              ))}
-            </div>
-          )}
+            {isRegionOpen && (
+              <div className="mt-3 space-y-2.5">
+                {regions.map((region) => (
+                  <label
+                    key={region}
+                    className="flex items-center gap-2.5 text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={pendingRegions.includes(region)}
+                      onChange={() => toggleRegion(region)}
+                      className="h-4 w-4 rounded border-black accent-black"
+                    />
+                    <span>{region}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <button
           type="button"
           onClick={handleApply}
-          className="w-full rounded-md bg-black px-4 py-2.5 text-sm text-white transition hover:opacity-80"
+          className="mt-4 w-full shrink-0 rounded-md bg-black px-4 py-2.5 text-sm text-white transition hover:opacity-80"
         >
           Застосувати
         </button>

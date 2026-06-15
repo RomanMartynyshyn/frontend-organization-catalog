@@ -163,21 +163,18 @@ export function CatalogHomeClient({
 
       <SelectedFilters filters={selectedFilters} onReset={resetFilters} />
 
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+      <div className="flex flex-col gap-6 lg:min-h-[480px] lg:h-[min(70vh,720px)] lg:flex-row lg:items-stretch">
         <FiltersPanel
           regions={availableRegions}
           selectedRegions={selectedRegions}
           onSelectedRegionsChange={setSelectedRegions}
-          onApply={() => undefined}
         />
 
-        <div className="min-w-0 flex-1">
-          {isLoading ? (
-            <div className="py-10 text-center text-gray-500">Завантаження…</div>
-          ) : (
-            <OrganizationsList data={filteredOrganizations} />
-          )}
-        </div>
+        <OrganizationsList
+          data={filteredOrganizations}
+          isLoading={isLoading}
+          alignWithFilters={availableRegions.length > 0}
+        />
       </div>
     </div>
   );
