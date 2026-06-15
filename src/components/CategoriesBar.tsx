@@ -56,12 +56,13 @@ export function CategoriesBar({
   }
 
   return (
-    <div className="space-y-4">
-      <div
-        ref={scrollRef}
-        onScroll={updateScrollState}
-        className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-      >
+    <section className="relative left-1/2 w-screen -translate-x-1/2">
+      <div className="space-y-4 px-4">
+        <div
+          ref={scrollRef}
+          onScroll={updateScrollState}
+          className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
         {categories.map((category) => {
           const id = String(category.id);
           const isActive = activeCategoryId === id;
@@ -137,6 +138,7 @@ export function CategoriesBar({
           </svg>
         </button>
       </div>
-    </div>
+      </div>
+    </section>
   );
 }
