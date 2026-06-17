@@ -29,6 +29,49 @@
   --font-sans: var(--font-inter);
 }
 
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine/e-Ukraine-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine/e-Ukraine-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine/e-Ukraine-Light.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine/e-Ukraine-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine/e-Ukraine-Thin.woff2") format("woff2");
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "e-Ukraine";
+  src: url("/fonts/e-Ukraine/e-Ukraine-UltraLight.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+}
+
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -38,4 +81,16 @@ body {
 :focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* для Chrome, Safari */
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* для IE и Edge */
+  scrollbar-width: none;
+  /* для Firefox */
 }
