@@ -18,7 +18,9 @@ export function FiltersPanel({
     useState<string[]>(selectedRegions);
 
   useEffect(() => {
-    setPendingRegions(selectedRegions);
+    setTimeout(() => {
+      setPendingRegions(selectedRegions);
+    }, 0);
   }, [selectedRegions]);
 
   const toggleRegion = (region: string) => {
