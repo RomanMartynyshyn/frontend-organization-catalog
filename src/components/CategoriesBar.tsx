@@ -4,19 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { CatalogCategory } from '@/types/catalog-api';
 
-// словарь соответствия id → иконка
-const categoryIcons: Record<string, string> = {
-  '1': 'card_travel.svg',
-  '2': 'cottage.svg',
-  '3': 'plug_connect.svg',
-  '4': 'dining.svg',
-  '5': 'cardiology.svg',
-  '6': 'apparel.svg',
-  '7': 'spa.svg',
-  '8': 'shopping_cart.svg',
-  '9': 'local_mall.svg',
-  '10': 'explore.svg',
-};
 
 type CategoriesBarProps = {
   categories: CatalogCategory[];
@@ -73,7 +60,6 @@ export function CategoriesBar({
           {categories.map((category) => {
             const id = String(category.id);
             const isActive = activeCategoryId === id;
-            const icon = categoryIcons[id]; // ← берём иконку по id
 
             return (
               <div
@@ -85,15 +71,15 @@ export function CategoriesBar({
                     : 'bg-[#D0D0D0] hover:cursor-pointer'
                 }`}
               >
-                {icon && (
+               
                   <Image
-                    src={`/assets/icons/${icon}`}
+                    src={`/assets/icons/icon-${category.id}.svg`}
                     alt={category.name}
                     width={24}
                     height={24}
                     className="h-6 w-6"
                   />
-                )}
+                
                 <p className="font-eUkraine text-base leading-6 font-normal text-black">
                   {category.name}
                 </p>
