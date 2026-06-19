@@ -41,8 +41,8 @@ export function mapOrganizationToCompany(org: CatalogOrganization): Company {
   const regions = [
     ...new Set(
       org.locations
-        .map((location) => location.region?.trim())
-        .filter((region): region is string => Boolean(region)),
+        .map((location) => (location as any).district?.trim()) // використовуємо district
+        .filter((item): item is string => Boolean(item)),
     ),
   ];
   const workingHours = org.workingHours?.trim();
