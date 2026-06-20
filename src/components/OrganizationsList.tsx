@@ -28,7 +28,7 @@ export function OrganizationsList({
       )}
 
       <div className="flex min-h-[280px] max-h-[min(55vh,480px)] flex-col rounded-2xl bg-[#d9d9d9] px-4 py-4 lg:max-h-none lg:min-h-0 lg:flex-1">
-        <div className="min-h-0 flex-1 overflow-y-auto pr-6">
+        <div className="min-h-0 flex-1 overflow-y-auto pr-8 sm:pr-10">
           {isLoading ? (
             <div className="flex min-h-[200px] items-center justify-center text-gray-600">
               Завантаження…

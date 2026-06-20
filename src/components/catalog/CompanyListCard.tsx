@@ -75,28 +75,28 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
   const hasDescription = Boolean(company.shortDescription?.trim());
 
   return (
-    <article className="rounded-[24px] bg-[#c4c4c4] p-6">
-      <div className="flex items-start gap-4">
-        <div className="flex w-[92px] shrink-0 flex-col items-center gap-2.5">
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#d9d9d9]">
+    <article className="rounded-[24px] bg-[#c4c4c4] p-4 sm:p-6">
+      <div className="flex items-start gap-3 sm:gap-4">
+        <div className="flex w-[68px] shrink-0 flex-col items-center gap-1.5 sm:w-[92px] sm:gap-2.5">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#d9d9d9] sm:h-20 sm:w-20">
             <Image
               src={getCategoryIconSrc(company.categoryId)}
               alt={categoryLabel || company.name}
               width={28}
               height={28}
-              className="h-7 w-7"
+              className="h-5 w-5 sm:h-7 sm:w-7"
             />
           </div>
 
           {categoryLabel ? (
-            <p className="max-w-[92px] text-center text-[11px] leading-[14px] text-black">
+            <p className="max-w-[68px] text-center text-[10px] leading-[13px] text-black sm:max-w-[92px] sm:text-[11px] sm:leading-[14px]">
               {categoryLabel}
             </p>
           ) : null}
         </div>
 
         <div className="min-w-0 flex-1 space-y-2 pt-0.5">
-          <h3 className="text-[26px] font-bold leading-[1.15] text-black">
+          <h3 className="break-words text-lg font-bold leading-tight text-black sm:text-xl md:text-[26px] md:leading-[1.15]">
             {company.name || '—'}
           </h3>
 
