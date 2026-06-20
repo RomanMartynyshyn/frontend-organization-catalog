@@ -39,11 +39,8 @@ export function OrganizationsList({
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {data.map((company, index) => (
-                <CompanyListCard
-                  key={`${company.id}-${index}`}
-                  company={company}
-                />
+              {data.map((company) => (
+                <CompanyListCard key={company.id} company={company} />
               ))}
 
               {hasMore && onLoadMore ? (

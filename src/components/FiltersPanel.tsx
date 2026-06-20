@@ -62,20 +62,24 @@ export function FiltersPanel({
 
             {isDistrictOpen ? (
               <div className="mt-3 space-y-2.5">
-                {districts.map((district) => (
-                  <label
-                    key={district}
-                    className="flex cursor-pointer items-center gap-2.5 text-sm text-black"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={pendingDistricts.includes(district)}
-                      onChange={() => toggleDistrict(district)}
-                      className="h-4 w-4 shrink-0 rounded-sm border border-black accent-black"
-                    />
-                    <span>{district}</span>
-                  </label>
-                ))}
+                {districts.length ? (
+                  districts.map((district) => (
+                    <label
+                      key={district}
+                      className="flex cursor-pointer items-center gap-2.5 text-sm text-black"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={pendingDistricts.includes(district)}
+                        onChange={() => toggleDistrict(district)}
+                        className="h-4 w-4 shrink-0 rounded-sm border border-black accent-black"
+                      />
+                      <span>{district}</span>
+                    </label>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-700">Райони зараз недоступні</p>
+                )}
               </div>
             ) : null}
           </div>

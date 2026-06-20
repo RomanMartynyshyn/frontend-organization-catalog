@@ -83,6 +83,11 @@ export async function fetchCategories(): Promise<CatalogCategory[]> {
   return data;
 }
 
+export async function fetchDistricts(): Promise<string[]> {
+  const { data } = await catalogFetch<string[]>('/api/organizations/districts');
+  return data ?? [];
+}
+
 export async function createOrganization(
   payload: CreateOrganizationPayload,
 ): Promise<CatalogOrganization> {
@@ -99,6 +104,7 @@ export async function fetchOrganizations(
 ): Promise<PaginatedOrganizations> {
   const {
     categoryId,
+    districts = [],
     limit = ORGANIZATIONS_PAGE_SIZE,
     offset = 0,
   } = params;
@@ -110,6 +116,10 @@ export async function fetchOrganizations(
 
   if (categoryId !== undefined) {
     searchParams.set('category_id', String(categoryId));
+  }
+
+  for (const district of districts) {
+    searchParams.append('district', district);
   }
 
   const { data } = await catalogFetch<CatalogOrganization[]>(
