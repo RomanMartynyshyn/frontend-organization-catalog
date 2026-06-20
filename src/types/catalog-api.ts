@@ -66,6 +66,7 @@ export type CatalogOrganization = {
 
 export type FetchOrganizationsParams = {
   categoryId?: number;
+  districts?: string[];
   limit?: number;
   offset?: number;
 };

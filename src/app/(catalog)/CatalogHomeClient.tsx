@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CategoriesBar } from '@/components/CategoriesBar';
 import { FiltersPanel } from '@/components/FiltersPanel';
@@ -9,14 +9,8 @@ import { OrganizationsList } from '@/components/OrganizationsList';
 import { SelectedFilters } from '@/components/SelectedFilters';
 import { useCatalogSearch } from '@/contexts/CatalogSearchContext';
 import { mapOrganizationToCompany } from '@/lib/catalog-api/mapToCompany';
-import { matchesSelectedDistricts } from '@/lib/catalog-api/inferDistrict';
 import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
-import { KRYVYI_RIH_DISTRICTS } from '@/lib/constants/districts';
-import type {
-  CatalogCategory,
-  CatalogOrganization,
-  PaginatedOrganizations,
-} from '@/types/catalog-api';
+import type { CatalogCategory, PaginatedOrganizations } from '@/types/catalog-api';
 import type { Company } from '@/types/company';
 
 type CatalogHomeClientProps = {
@@ -25,17 +19,26 @@ type CatalogHomeClientProps = {
   categories: CatalogCategory[];
 };
 
+type OrganizationQuery = {
+  categoryId: string | null;
+  districts: string[];
+};
+
 async function fetchOrganizationsPage(
   offset: number,
-  categoryId: string | null,
+  query: OrganizationQuery,
 ): Promise<PaginatedOrganizations> {
   const params = new URLSearchParams({
     limit: String(ORGANIZATIONS_PAGE_SIZE),
     offset: String(offset),
   });
 
-  if (categoryId !== null) {
-    params.set('category_id', categoryId);
+  if (query.categoryId !== null) {
+    params.set('category_id', query.categoryId);
+  }
+
+  for (const district of query.districts) {
+    params.append('district', district);
   }
 
   const response = await fetch(`/api/organizations?${params.toString()}`);
@@ -47,29 +50,22 @@ async function fetchOrganizationsPage(
   return (await response.json()) as PaginatedOrganizations;
 }
 
-async function fetchAllOrganizations(
-  categoryId: string | null,
-): Promise<Company[]> {
-  const allItems: CatalogOrganization[] = [];
-  let offset = 0;
-  let hasMore = true;
+async function fetchDistrictOptions(): Promise<string[]> {
+  const response = await fetch('/api/organizations/districts');
 
-  while (hasMore) {
-    const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
-      offset,
-      categoryId,
-    );
-
-    if (!items.length) {
-      break;
-    }
-
-    allItems.push(...items);
-    offset += items.length;
-    hasMore = nextHasMore;
+  if (!response.ok) {
+    return [];
   }
 
-  return allItems.map(mapOrganizationToCompany);
+  const data = (await response.json()) as unknown;
+
+  if (!Array.isArray(data)) {
+    return [];
+  }
+
+  return data
+    .map((item) => (typeof item === 'string' ? item.trim() : ''))
+    .filter((item): item is string => Boolean(item));
 }
 
 export function CatalogHomeClient({
@@ -84,60 +80,55 @@ export function CatalogHomeClient({
   const [nextOffset, setNextOffset] = useState(initialOrganizations.length);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const isDistrictFilterActive = selectedDistricts.length > 0;
+  useEffect(() => {
+    void fetchDistrictOptions().then(setDistrictOptions);
+  }, []);
 
-  const restorePaginatedOrganizations = useCallback(
-    async (categoryId: string | null) => {
-      if (categoryId === null) {
-        setOrganizations(initialOrganizations);
-        setHasMore(initialHasMore);
-        setNextOffset(initialOrganizations.length);
-        return;
-      }
+  const buildQuery = useCallback(
+    (overrides?: Partial<OrganizationQuery>): OrganizationQuery => ({
+      categoryId: activeCategoryId,
+      districts: selectedDistricts,
+      ...overrides,
+    }),
+    [activeCategoryId, selectedDistricts],
+  );
 
+  const loadOrganizations = useCallback(
+    async (query: OrganizationQuery, offset = 0, append = false) => {
       const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
-        0,
-        categoryId,
+        offset,
+        query,
       );
-      setOrganizations(items.map(mapOrganizationToCompany));
+      const mapped = items.map(mapOrganizationToCompany);
+
+      setOrganizations((current) => (append ? [...current, ...mapped] : mapped));
       setHasMore(nextHasMore);
-      setNextOffset(items.length);
+      setNextOffset(offset + items.length);
     },
-    [initialHasMore, initialOrganizations],
+    [],
   );
 
   const handleSelectedDistrictsChange = useCallback(
     async (districts: string[]) => {
-      const wasDistrictFilterActive = selectedDistricts.length > 0;
-      const isDistrictFilterActiveNext = districts.length > 0;
-
       setSelectedDistricts(districts);
-
-      if (wasDistrictFilterActive === isDistrictFilterActiveNext) {
-        return;
-      }
-
       setIsLoading(true);
 
       try {
-        if (isDistrictFilterActiveNext) {
-          const allOrganizations = await fetchAllOrganizations(activeCategoryId);
-          setOrganizations(allOrganizations);
-          setHasMore(false);
-          return;
-        }
-
-        await restorePaginatedOrganizations(activeCategoryId);
+        await loadOrganizations(buildQuery({ districts }), 0, false);
       } catch (error) {
         console.error(error);
+        setOrganizations([]);
+        setHasMore(false);
+        setNextOffset(0);
       } finally {
         setIsLoading(false);
       }
     },
-    [activeCategoryId, restorePaginatedOrganizations, selectedDistricts.length],
+    [buildQuery, loadOrganizations],
   );
 
   const handleCategorySelect = useCallback(
@@ -146,73 +137,46 @@ export function CatalogHomeClient({
       setIsLoading(true);
 
       try {
-        if (selectedDistricts.length > 0) {
-          const allOrganizations = await fetchAllOrganizations(id);
-          setOrganizations(allOrganizations);
-          setHasMore(false);
-          return;
-        }
-
-        await restorePaginatedOrganizations(id);
+        await loadOrganizations(buildQuery({ categoryId: id }), 0, false);
       } catch (error) {
         console.error(error);
         setOrganizations([]);
         setHasMore(false);
+        setNextOffset(0);
       } finally {
         setIsLoading(false);
       }
     },
-    [restorePaginatedOrganizations, selectedDistricts.length],
+    [buildQuery, loadOrganizations],
   );
 
   const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore || isDistrictFilterActive) {
+    if (isLoadingMore || !hasMore) {
       return;
     }
 
     setIsLoadingMore(true);
 
     try {
-      const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
-        nextOffset,
-        activeCategoryId,
-      );
-
-      setOrganizations((current) => [
-        ...current,
-        ...items.map(mapOrganizationToCompany),
-      ]);
-      setNextOffset((current) => current + items.length);
-      setHasMore(nextHasMore);
+      await loadOrganizations(buildQuery(), nextOffset, true);
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoadingMore(false);
     }
-  }, [
-    activeCategoryId,
-    hasMore,
-    isDistrictFilterActive,
-    isLoadingMore,
-    nextOffset,
-  ]);
+  }, [buildQuery, hasMore, isLoadingMore, loadOrganizations, nextOffset]);
 
   const filteredOrganizations = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
-    const filtered = organizations.filter((organization) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        organization.name.toLowerCase().includes(normalizedSearch);
+    if (!normalizedSearch) {
+      return organizations;
+    }
 
-      return (
-        matchesSearch &&
-        matchesSelectedDistricts(organization.regions, selectedDistricts)
-      );
-    });
-
-    return filtered;
-  }, [organizations, search, selectedDistricts]);
+    return organizations.filter((organization) =>
+      organization.name.toLowerCase().includes(normalizedSearch),
+    );
+  }, [organizations, search]);
 
   const activeCategoryName = useMemo(() => {
     if (!activeCategoryId) {
@@ -294,7 +258,7 @@ export function CatalogHomeClient({
 
       <div className="flex flex-col gap-6 lg:min-h-[480px] lg:h-[min(70vh,720px)] lg:flex-row lg:items-stretch">
         <FiltersPanel
-          districts={KRYVYI_RIH_DISTRICTS}
+          districts={districtOptions}
           selectedDistricts={selectedDistricts}
           onSelectedDistrictsChange={handleSelectedDistrictsChange}
         />
@@ -302,7 +266,7 @@ export function CatalogHomeClient({
         <OrganizationsList
           data={filteredOrganizations}
           isLoading={isLoading}
-          hasMore={!isDistrictFilterActive && hasMore}
+          hasMore={hasMore}
           isLoadingMore={isLoadingMore}
           onLoadMore={handleLoadMore}
           alignWithFilters

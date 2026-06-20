@@ -77,6 +77,7 @@ function parsePositiveInt(
 
 export async function GET(request: NextRequest) {
   const categoryIdParam = request.nextUrl.searchParams.get('category_id');
+  const districtParams = request.nextUrl.searchParams.getAll('district');
   const limitParam = request.nextUrl.searchParams.get('limit');
   const offsetParam = request.nextUrl.searchParams.get('offset');
 
@@ -104,7 +105,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await fetchOrganizations({ categoryId, limit, offset });
+    const result = await fetchOrganizations({
+      categoryId,
+      districts: districtParams,
+      limit,
+      offset,
+    });
     return NextResponse.json(result);
   } catch (error) {
     console.error('[GET /api/organizations]', error);
