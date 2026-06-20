@@ -25,27 +25,6 @@ type CatalogHomeClientProps = {
   categories: CatalogCategory[];
 };
 
-function dedupeCompanies(items: Company[]): Company[] {
-  const itemsById = new Map<number, Company>();
-
-  for (const item of items) {
-    itemsById.set(item.id, item);
-  }
-
-  return [...itemsById.values()];
-}
-
-function appendOrganizations(current: Company[], next: Company[]): Company[] {
-  if (!next.length) {
-    return current;
-  }
-
-  const existingIds = new Set(current.map((organization) => organization.id));
-  const uniqueNext = next.filter((organization) => !existingIds.has(organization.id));
-
-  return uniqueNext.length ? [...current, ...uniqueNext] : current;
-}
-
 async function fetchOrganizationsPage(
   offset: number,
   categoryId: string | null,
@@ -71,7 +50,7 @@ async function fetchOrganizationsPage(
 async function fetchAllOrganizations(
   categoryId: string | null,
 ): Promise<Company[]> {
-  const itemsById = new Map<number, CatalogOrganization>();
+  const allItems: CatalogOrganization[] = [];
   let offset = 0;
   let hasMore = true;
 
@@ -85,20 +64,12 @@ async function fetchAllOrganizations(
       break;
     }
 
-    let addedCount = 0;
-
-    for (const item of items) {
-      if (!itemsById.has(item.id)) {
-        itemsById.set(item.id, item);
-        addedCount += 1;
-      }
-    }
-
+    allItems.push(...items);
     offset += items.length;
-    hasMore = nextHasMore && addedCount > 0;
+    hasMore = nextHasMore;
   }
 
-  return [...itemsById.values()].map(mapOrganizationToCompany);
+  return allItems.map(mapOrganizationToCompany);
 }
 
 export function CatalogHomeClient({
@@ -110,6 +81,7 @@ export function CatalogHomeClient({
   const [organizations, setOrganizations] =
     useState<Company[]>(initialOrganizations);
   const [hasMore, setHasMore] = useState(initialHasMore);
+  const [nextOffset, setNextOffset] = useState(initialOrganizations.length);
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -122,6 +94,7 @@ export function CatalogHomeClient({
       if (categoryId === null) {
         setOrganizations(initialOrganizations);
         setHasMore(initialHasMore);
+        setNextOffset(initialOrganizations.length);
         return;
       }
 
@@ -131,6 +104,7 @@ export function CatalogHomeClient({
       );
       setOrganizations(items.map(mapOrganizationToCompany));
       setHasMore(nextHasMore);
+      setNextOffset(items.length);
     },
     [initialHasMore, initialOrganizations],
   );
@@ -200,13 +174,15 @@ export function CatalogHomeClient({
 
     try {
       const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
-        organizations.length,
+        nextOffset,
         activeCategoryId,
       );
 
-      setOrganizations((current) =>
-        appendOrganizations(current, items.map(mapOrganizationToCompany)),
-      );
+      setOrganizations((current) => [
+        ...current,
+        ...items.map(mapOrganizationToCompany),
+      ]);
+      setNextOffset((current) => current + items.length);
       setHasMore(nextHasMore);
     } catch (error) {
       console.error(error);
@@ -218,7 +194,7 @@ export function CatalogHomeClient({
     hasMore,
     isDistrictFilterActive,
     isLoadingMore,
-    organizations.length,
+    nextOffset,
   ]);
 
   const filteredOrganizations = useMemo(() => {
@@ -235,7 +211,7 @@ export function CatalogHomeClient({
       );
     });
 
-    return dedupeCompanies(filtered);
+    return filtered;
   }, [organizations, search, selectedDistricts]);
 
   const activeCategoryName = useMemo(() => {
@@ -301,6 +277,7 @@ export function CatalogHomeClient({
     setActiveCategoryId(null);
     setOrganizations(initialOrganizations);
     setHasMore(initialHasMore);
+    setNextOffset(initialOrganizations.length);
   };
 
   return (
