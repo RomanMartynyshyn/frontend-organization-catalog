@@ -92,10 +92,6 @@ export default function CompanyPageClient({
                 <p className="font-medium">{company.category}</p>
               </div>
 
-              <div className="rounded-xl border px-4 py-2">
-                <p className="font-medium">{company.status}</p>
-              </div>
-
               <Link
                 href="#review-form"
                 className={cn(
