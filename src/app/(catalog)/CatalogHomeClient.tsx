@@ -14,6 +14,7 @@ import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
 import { KRYVYI_RIH_DISTRICTS } from '@/lib/constants/districts';
 import type {
   CatalogCategory,
+  CatalogOrganization,
   PaginatedOrganizations,
 } from '@/types/catalog-api';
 import type { Company } from '@/types/company';
@@ -23,6 +24,16 @@ type CatalogHomeClientProps = {
   initialHasMore: boolean;
   categories: CatalogCategory[];
 };
+
+function dedupeCompanies(items: Company[]): Company[] {
+  const itemsById = new Map<number, Company>();
+
+  for (const item of items) {
+    itemsById.set(item.id, item);
+  }
+
+  return [...itemsById.values()];
+}
 
 function appendOrganizations(current: Company[], next: Company[]): Company[] {
   if (!next.length) {
@@ -57,6 +68,39 @@ async function fetchOrganizationsPage(
   return (await response.json()) as PaginatedOrganizations;
 }
 
+async function fetchAllOrganizations(
+  categoryId: string | null,
+): Promise<Company[]> {
+  const itemsById = new Map<number, CatalogOrganization>();
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
+      offset,
+      categoryId,
+    );
+
+    if (!items.length) {
+      break;
+    }
+
+    let addedCount = 0;
+
+    for (const item of items) {
+      if (!itemsById.has(item.id)) {
+        itemsById.set(item.id, item);
+        addedCount += 1;
+      }
+    }
+
+    offset += items.length;
+    hasMore = nextHasMore && addedCount > 0;
+  }
+
+  return [...itemsById.values()].map(mapOrganizationToCompany);
+}
+
 export function CatalogHomeClient({
   initialOrganizations,
   initialHasMore,
@@ -71,22 +115,71 @@ export function CatalogHomeClient({
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const handleCategorySelect = useCallback(
-    async (id: string | null) => {
-      setActiveCategoryId(id);
+  const isDistrictFilterActive = selectedDistricts.length > 0;
 
-      if (id === null) {
+  const restorePaginatedOrganizations = useCallback(
+    async (categoryId: string | null) => {
+      if (categoryId === null) {
         setOrganizations(initialOrganizations);
         setHasMore(initialHasMore);
+        return;
+      }
+
+      const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
+        0,
+        categoryId,
+      );
+      setOrganizations(items.map(mapOrganizationToCompany));
+      setHasMore(nextHasMore);
+    },
+    [initialHasMore, initialOrganizations],
+  );
+
+  const handleSelectedDistrictsChange = useCallback(
+    async (districts: string[]) => {
+      const wasDistrictFilterActive = selectedDistricts.length > 0;
+      const isDistrictFilterActiveNext = districts.length > 0;
+
+      setSelectedDistricts(districts);
+
+      if (wasDistrictFilterActive === isDistrictFilterActiveNext) {
         return;
       }
 
       setIsLoading(true);
 
       try {
-        const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(0, id);
-        setOrganizations(items.map(mapOrganizationToCompany));
-        setHasMore(nextHasMore);
+        if (isDistrictFilterActiveNext) {
+          const allOrganizations = await fetchAllOrganizations(activeCategoryId);
+          setOrganizations(allOrganizations);
+          setHasMore(false);
+          return;
+        }
+
+        await restorePaginatedOrganizations(activeCategoryId);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [activeCategoryId, restorePaginatedOrganizations, selectedDistricts.length],
+  );
+
+  const handleCategorySelect = useCallback(
+    async (id: string | null) => {
+      setActiveCategoryId(id);
+      setIsLoading(true);
+
+      try {
+        if (selectedDistricts.length > 0) {
+          const allOrganizations = await fetchAllOrganizations(id);
+          setOrganizations(allOrganizations);
+          setHasMore(false);
+          return;
+        }
+
+        await restorePaginatedOrganizations(id);
       } catch (error) {
         console.error(error);
         setOrganizations([]);
@@ -95,11 +188,11 @@ export function CatalogHomeClient({
         setIsLoading(false);
       }
     },
-    [initialHasMore, initialOrganizations],
+    [restorePaginatedOrganizations, selectedDistricts.length],
   );
 
   const handleLoadMore = useCallback(async () => {
-    if (isLoadingMore || !hasMore) {
+    if (isLoadingMore || !hasMore || isDistrictFilterActive) {
       return;
     }
 
@@ -120,12 +213,18 @@ export function CatalogHomeClient({
     } finally {
       setIsLoadingMore(false);
     }
-  }, [activeCategoryId, hasMore, isLoadingMore, organizations.length]);
+  }, [
+    activeCategoryId,
+    hasMore,
+    isDistrictFilterActive,
+    isLoadingMore,
+    organizations.length,
+  ]);
 
   const filteredOrganizations = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
-    return organizations.filter((organization) => {
+    const filtered = organizations.filter((organization) => {
       const matchesSearch =
         !normalizedSearch ||
         organization.name.toLowerCase().includes(normalizedSearch);
@@ -135,6 +234,8 @@ export function CatalogHomeClient({
         matchesSelectedDistricts(organization.regions, selectedDistricts)
       );
     });
+
+    return dedupeCompanies(filtered);
   }, [organizations, search, selectedDistricts]);
 
   const activeCategoryName = useMemo(() => {
@@ -167,8 +268,8 @@ export function CatalogHomeClient({
         id: `district-${district}`,
         label: district,
         onRemove: () =>
-          setSelectedDistricts((current) =>
-            current.filter((item) => item !== district),
+          handleSelectedDistrictsChange(
+            selectedDistricts.filter((item) => item !== district),
           ),
       });
     });
@@ -188,6 +289,7 @@ export function CatalogHomeClient({
     activeCategoryId,
     activeCategoryName,
     handleCategorySelect,
+    handleSelectedDistrictsChange,
     search,
     selectedDistricts,
     setSearch,
@@ -196,7 +298,9 @@ export function CatalogHomeClient({
   const resetFilters = () => {
     setSearch('');
     setSelectedDistricts([]);
-    handleCategorySelect(null);
+    setActiveCategoryId(null);
+    setOrganizations(initialOrganizations);
+    setHasMore(initialHasMore);
   };
 
   return (
@@ -215,13 +319,13 @@ export function CatalogHomeClient({
         <FiltersPanel
           districts={KRYVYI_RIH_DISTRICTS}
           selectedDistricts={selectedDistricts}
-          onSelectedDistrictsChange={setSelectedDistricts}
+          onSelectedDistrictsChange={handleSelectedDistrictsChange}
         />
 
         <OrganizationsList
           data={filteredOrganizations}
           isLoading={isLoading}
-          hasMore={hasMore}
+          hasMore={!isDistrictFilterActive && hasMore}
           isLoadingMore={isLoadingMore}
           onLoadMore={handleLoadMore}
           alignWithFilters
