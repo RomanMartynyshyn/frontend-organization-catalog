@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import type { CatalogCategory } from '@/types/catalog-api';
+import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
 
 
 type CategoriesBarProps = {
@@ -73,14 +74,14 @@ export function CategoriesBar({
               >
                
                   <Image
-                    src={`/assets/icons/icon-${category.id}.svg`}
+                    src={getCategoryIconSrc(category.id)}
                     alt={category.name}
                     width={24}
                     height={24}
                     className="h-6 w-6"
                   />
                 
-                <p className="font-eUkraine text-base leading-6 font-normal text-black">
+                <p className="text-base leading-6 font-normal text-black">
                   {category.name}
                 </p>
               </div>

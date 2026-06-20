@@ -1,6 +1,10 @@
+import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
 import type {
   CatalogCategory,
-  CatalogOrganization, CreateOrganizationPayload,
+  CatalogOrganization,
+  CreateOrganizationPayload,
+  FetchOrganizationsParams,
+  PaginatedOrganizations,
 } from '@/types/catalog-api';
 
 const API_URL = process.env.API_URL || 'http://3458052.levelhst.web.hosting-test.net';
@@ -91,14 +95,33 @@ export async function createOrganization(
 }
 
 export async function fetchOrganizations(
-  categoryId?: number,
-): Promise<CatalogOrganization[]> {
-  const query =
-    categoryId !== undefined ? `?category_id=${encodeURIComponent(categoryId)}` : '';
+  params: FetchOrganizationsParams = {},
+): Promise<PaginatedOrganizations> {
+  const {
+    categoryId,
+    limit = ORGANIZATIONS_PAGE_SIZE,
+    offset = 0,
+  } = params;
+
+  const searchParams = new URLSearchParams({
+    limit: String(limit),
+    offset: String(offset),
+  });
+
+  if (categoryId !== undefined) {
+    searchParams.set('category_id', String(categoryId));
+  }
+
   const { data } = await catalogFetch<CatalogOrganization[]>(
-    `/api/organizations${query}`,
+    `/api/organizations?${searchParams.toString()}`,
   );
-  return data;
+
+  const items = data ?? [];
+
+  return {
+    items,
+    hasMore: items.length === limit,
+  };
 }
 
 export async function fetchOrganizationById(

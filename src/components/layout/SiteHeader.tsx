@@ -7,49 +7,64 @@ import { routes } from '@/config/routes';
 
 const CITY_NAME = 'Кривий Ріг';
 
+const SearchArrowIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="h-5 w-5 shrink-0"
+    aria-hidden="true"
+  >
+    <path d="M5 12h14" />
+    <path d="m13 6 6 6-6 6" />
+  </svg>
+);
+
 export function SiteHeader() {
   const { search, setSearch } = useCatalogSearch();
 
   return (
-    <header className="border-border bg-card border-b shadow-sm">
-      <div className="mx-auto flex max-w-6xl flex-col items-stretch gap-3 px-4 py-4 sm:flex-row sm:items-center sm:gap-4">
-        <Link href={routes.home} className="shrink-0">
-          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[#d9d9d9] text-sm font-bold">
-            logo
-          </span>
+    <header className="border-b border-black/10 bg-white">
+      <div className="mx-auto flex h-[92px] max-w-[1440px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
+        <Link
+          href={routes.home}
+          className="inline-flex shrink-0 items-center rounded-lg bg-black px-5 py-2.5 text-sm lowercase text-white transition hover:opacity-80"
+        >
+          logo
         </Link>
 
-        <div className="flex min-w-0 flex-1 items-center gap-3 rounded-full border border-black bg-[#d9d9d9] px-4 py-2.5 shadow-sm">
-          <span className="shrink-0 text-sm font-semibold">{CITY_NAME}</span>
+        <div className="flex min-w-0 flex-1 justify-center px-2">
+          <div className="flex w-full max-w-[640px] overflow-hidden rounded-lg border border-black">
+            <span className="inline-flex shrink-0 items-center bg-black px-4 py-2.5 text-sm font-bold text-white sm:px-5">
+              {CITY_NAME}
+            </span>
 
-          <div className="h-5 w-px shrink-0 bg-black/20" />
-
-          <input
-            type="text"
-            name="search"
-            id="search"
-            autoComplete="off"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Введіть свій запит"
-            className="min-w-0 flex-1 bg-transparent text-sm outline-none"
-          />
-
-          <svg
-            className="h-5 w-5 shrink-0 text-gray-600"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+            <label className="flex min-w-0 flex-1 items-center gap-3 bg-white px-4 py-2.5">
+              <span className="sr-only">Пошук організацій</span>
+              <input
+                type="search"
+                name="search"
+                id="search"
+                autoComplete="off"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Введіть свій запит"
+                className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-[#6b6b6b]"
+              />
+              <span className="shrink-0 text-[#6b6b6b]">
+                <SearchArrowIcon />
+              </span>
+            </label>
+          </div>
         </div>
 
         <Link
           href={routes.addCompany}
-          className="shrink-0 rounded-md bg-black px-4 py-2.5 text-center text-sm text-white transition hover:opacity-80 sm:shrink-0"
+          className="inline-flex shrink-0 items-center rounded-lg bg-black px-4 py-2.5 text-sm text-white transition hover:opacity-80 sm:px-5"
         >
           Додати організацію
         </Link>

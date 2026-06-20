@@ -1,8 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { routes } from '@/config/routes';
+import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
 import type { Company } from '@/types/company';
 
 type CompanyListCardProps = {
@@ -18,7 +20,7 @@ const LocationIcon = () => (
     strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="h-4 w-4 shrink-0 text-gray-600"
+    className="h-4 w-4 shrink-0"
     aria-hidden="true"
   >
     <path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z" />
@@ -43,79 +45,91 @@ const ClockIcon = () => (
   </svg>
 );
 
-const StoreIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className="h-8 w-8 text-gray-700"
-    aria-hidden="true"
-  >
-    <path d="M6 7h12l-1 12H7L6 7z" />
-    <path d="M9 7V5a3 3 0 0 1 6 0v2" />
-  </svg>
-);
+function formatWorkingHoursLabel(workingHours: string): string {
+  const normalized = workingHours.trim();
+
+  if (!normalized) {
+    return '';
+  }
+
+  if (/24\s*\/\s*7|цілодобово/i.test(normalized)) {
+    return 'Цілодобово';
+  }
+
+  const closingTimeMatch = normalized.match(/(\d{1,2}:\d{2})\s*$/);
+
+  if (closingTimeMatch) {
+    return `Відчинено до ${closingTimeMatch[1]}`;
+  }
+
+  return normalized;
+}
 
 export function CompanyListCard({ company }: CompanyListCardProps) {
-  const hasCategory = Boolean(company.category?.trim());
-  const hasAddress = Boolean(company.primaryAddress?.trim());
-  const hasWorkingHours = Boolean(company.workingHours?.trim());
+  const categoryLabel = company.primaryCategoryName || company.category.trim();
+  const displayAddress =
+    company.streetAddress.trim() || company.primaryAddress.trim();
+  const workingHoursLabel = company.workingHours
+    ? formatWorkingHoursLabel(company.workingHours)
+    : '';
   const hasDescription = Boolean(company.shortDescription?.trim());
 
   return (
-    <article className="rounded-2xl bg-[#c4c4c4] p-5">
-      <div className="flex gap-5">
-        <div className="flex w-24 shrink-0 flex-col items-center gap-2">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#d9d9d9]">
-            <StoreIcon />
+    <article className="rounded-[24px] bg-[#c4c4c4] p-6">
+      <div className="flex items-start gap-4">
+        <div className="flex w-[92px] shrink-0 flex-col items-center gap-2.5">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#d9d9d9]">
+            <Image
+              src={getCategoryIconSrc(company.categoryId)}
+              alt={categoryLabel || company.name}
+              width={28}
+              height={28}
+              className="h-7 w-7"
+            />
           </div>
 
-          {hasCategory && (
-            <p className="text-center text-xs leading-snug text-gray-700">
-              {company.category}
+          {categoryLabel ? (
+            <p className="max-w-[92px] text-center text-[11px] leading-[14px] text-black">
+              {categoryLabel}
             </p>
-          )}
+          ) : null}
         </div>
 
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="space-y-2">
-            <h3 className="text-xl font-bold leading-tight">
-              {company.name || '—'}
-            </h3>
+        <div className="min-w-0 flex-1 space-y-2 pt-0.5">
+          <h3 className="text-[26px] font-bold leading-[1.15] text-black">
+            {company.name || '—'}
+          </h3>
 
-            {hasAddress && (
-              <p className="flex items-start gap-2 text-sm text-gray-700">
-                <LocationIcon />
-                <span>{company.primaryAddress}</span>
-              </p>
-            )}
-
-            {hasWorkingHours && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-black/50 px-3 py-1 text-xs text-gray-700">
-                <ClockIcon />
-                {company.workingHours}
-              </span>
-            )}
-          </div>
-
-          {hasDescription && (
-            <p className="text-sm leading-relaxed text-gray-600">
-              {company.shortDescription}
+          {displayAddress ? (
+            <p className="flex items-center gap-1.5 text-sm leading-snug text-black">
+              <LocationIcon />
+              <span>{displayAddress}</span>
             </p>
-          )}
+          ) : null}
 
-          <div className="flex justify-end pt-1">
-            <Link
-              href={routes.company(company.id)}
-              className="inline-flex rounded-md bg-black px-5 py-2 text-sm text-white transition hover:opacity-80"
-            >
-              Детальніше
-            </Link>
-          </div>
+          {workingHoursLabel ? (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-black px-3 py-1 text-xs leading-none text-black">
+              <ClockIcon />
+              {workingHoursLabel}
+            </span>
+          ) : null}
+        </div>
+      </div>
+
+      {hasDescription ? (
+        <p className="mt-5 line-clamp-2 text-sm leading-[1.45] text-black">
+          {company.shortDescription}
+        </p>
+      ) : null}
+
+      <div className={hasDescription ? 'mt-5' : 'mt-6'}>
+        <div className="flex justify-end">
+          <Link
+            href={routes.company(company.id)}
+            className="inline-flex min-w-[148px] items-center justify-center rounded-2xl bg-black px-8 py-3 text-sm font-normal text-white transition hover:opacity-80"
+          >
+            Детальніше
+          </Link>
         </div>
       </div>
     </article>

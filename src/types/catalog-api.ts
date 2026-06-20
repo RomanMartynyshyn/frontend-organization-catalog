@@ -35,6 +35,7 @@ export type CatalogLocation = {
   postCode: string | null;
   latitude: number | string;
   longitude: number | string;
+  district?: string | null;
 };
 
 export type CatalogLocationInput = {
@@ -61,6 +62,17 @@ export type CatalogOrganization = {
   rejectionReason: string | null;
   categories: CatalogOrganizationCategory[];
   locations: CatalogLocation[];
+};
+
+export type FetchOrganizationsParams = {
+  categoryId?: number;
+  limit?: number;
+  offset?: number;
+};
+
+export type PaginatedOrganizations = {
+  items: CatalogOrganization[];
+  hasMore: boolean;
 };
 
 export type CreateOrganizationPayload = {

@@ -1,12 +1,6 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/app/providers';
-
-const inter = Inter({
-  variable: '--font-inter',
-  subsets: ['latin', 'cyrillic-ext'],
-});
 
 export const metadata: Metadata = {
   title: 'Каталог організацій',
@@ -20,9 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk" className="h-full">
-      <body
-        className={`${inter.className} flex min-h-screen flex-col antialiased`}
-      >
+      <body className="flex min-h-screen flex-col antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

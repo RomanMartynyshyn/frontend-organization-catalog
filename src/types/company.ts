@@ -6,10 +6,13 @@ export type Company = {
   shortDescription: string;
   rating: number;
   category: string;
+  categoryId: number | null;
+  primaryCategoryName: string;
   status: CompanyStatus;
   workingHours?: string;
   regions: string[];
   primaryAddress: string;
+  streetAddress: string;
   addresses: string[];
   contacts: {
     website: string;
