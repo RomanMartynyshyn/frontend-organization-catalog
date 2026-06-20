@@ -5,6 +5,7 @@ import {
   createOrganization,
   fetchOrganizations,
 } from '@/lib/catalog-api/client';
+import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
 import type {
   CatalogLocationInput,
   CreateOrganizationPayload,
@@ -57,8 +58,27 @@ function validateLocations(
   return validated;
 }
 
+function parsePositiveInt(
+  value: string | null,
+  fallback: number,
+): number | null {
+  if (value === null || value === '') {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
 export async function GET(request: NextRequest) {
   const categoryIdParam = request.nextUrl.searchParams.get('category_id');
+  const limitParam = request.nextUrl.searchParams.get('limit');
+  const offsetParam = request.nextUrl.searchParams.get('offset');
 
   let categoryId: number | undefined;
 
@@ -73,9 +93,19 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const limit = parsePositiveInt(limitParam, ORGANIZATIONS_PAGE_SIZE);
+  const offset = parsePositiveInt(offsetParam, 0);
+
+  if (limit === null || offset === null || limit < 1) {
+    return NextResponse.json(
+      { message: 'Invalid limit or offset' },
+      { status: 400 },
+    );
+  }
+
   try {
-    const organizations = await fetchOrganizations(categoryId);
-    return NextResponse.json(organizations);
+    const result = await fetchOrganizations({ categoryId, limit, offset });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('[GET /api/organizations]', error);
     return NextResponse.json(

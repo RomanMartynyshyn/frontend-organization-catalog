@@ -3,57 +3,53 @@
 import { useEffect, useState } from 'react';
 
 type FiltersPanelProps = {
-  regions: string[];
-  selectedRegions: string[];
-  onSelectedRegionsChange: (regions: string[]) => void;
+  districts: readonly string[];
+  selectedDistricts: string[];
+  onSelectedDistrictsChange: (districts: string[]) => void;
 };
 
 export function FiltersPanel({
-  regions,
-  selectedRegions,
-  onSelectedRegionsChange,
+  districts,
+  selectedDistricts,
+  onSelectedDistrictsChange,
 }: FiltersPanelProps) {
-  const [isRegionOpen, setIsRegionOpen] = useState(true);
-  const [pendingRegions, setPendingRegions] =
-    useState<string[]>(selectedRegions);
+  const [isDistrictOpen, setIsDistrictOpen] = useState(true);
+  const [pendingDistricts, setPendingDistricts] =
+    useState<string[]>(selectedDistricts);
 
   useEffect(() => {
     setTimeout(() => {
-      setPendingRegions(selectedRegions);
+      setPendingDistricts(selectedDistricts);
     }, 0);
-  }, [selectedRegions]);
+  }, [selectedDistricts]);
 
-  const toggleRegion = (region: string) => {
-    setPendingRegions((current) =>
-      current.includes(region)
-        ? current.filter((item) => item !== region)
-        : [...current, region],
+  const toggleDistrict = (district: string) => {
+    setPendingDistricts((current) =>
+      current.includes(district)
+        ? current.filter((item) => item !== district)
+        : [...current, district],
     );
   };
 
   const handleApply = () => {
-    onSelectedRegionsChange(pendingRegions);
+    onSelectedDistrictsChange(pendingDistricts);
   };
-
-  if (!regions.length) {
-    return null;
-  }
 
   return (
     <aside className="flex w-full shrink-0 flex-col lg:h-full lg:w-[240px]">
-      <h2 className="mb-4 shrink-0 text-lg font-semibold">Фільтри</h2>
+      <h2 className="mb-4 shrink-0 text-lg font-bold text-black">Фільтри</h2>
 
       <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#d9d9d9] p-4">
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="border-b border-black/20 pb-4">
+          <div className="pb-4">
             <button
               type="button"
-              onClick={() => setIsRegionOpen((open) => !open)}
-              className="flex w-full items-center justify-between text-sm font-semibold"
+              onClick={() => setIsDistrictOpen((open) => !open)}
+              className="flex w-full items-center justify-between text-sm font-bold text-black"
             >
               Район
               <svg
-                className={`h-4 w-4 transition ${isRegionOpen ? 'rotate-180' : ''}`}
+                className={`h-4 w-4 shrink-0 transition ${isDistrictOpen ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -64,24 +60,24 @@ export function FiltersPanel({
               </svg>
             </button>
 
-            {isRegionOpen && (
+            {isDistrictOpen ? (
               <div className="mt-3 space-y-2.5">
-                {regions.map((region) => (
+                {districts.map((district) => (
                   <label
-                    key={region}
-                    className="flex items-center gap-2.5 text-sm"
+                    key={district}
+                    className="flex cursor-pointer items-center gap-2.5 text-sm text-black"
                   >
                     <input
                       type="checkbox"
-                      checked={pendingRegions.includes(region)}
-                      onChange={() => toggleRegion(region)}
-                      className="h-4 w-4 rounded border-black accent-black"
+                      checked={pendingDistricts.includes(district)}
+                      onChange={() => toggleDistrict(district)}
+                      className="h-4 w-4 shrink-0 rounded-sm border border-black accent-black"
                     />
-                    <span>{region}</span>
+                    <span>{district}</span>
                   </label>
                 ))}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
 

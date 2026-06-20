@@ -1,4 +1,5 @@
 import type { CatalogLocation, CatalogOrganization } from '@/types/catalog-api';
+import { resolveOrganizationDistricts } from '@/lib/catalog-api/inferDistrict';
 import type { Company, CompanyStatus } from '@/types/company';
 
 function mapOrganizationStatus(status: string): CompanyStatus {
@@ -38,14 +39,10 @@ export function mapOrganizationToCompany(org: CatalogOrganization): Company {
   const website = org.websiteUrl ? stripWebsiteProtocol(org.websiteUrl) : '';
   const social = org.sociaLinks ?? {};
   const addresses = org.locations.map(formatLocation);
-  const regions = [
-    ...new Set(
-      org.locations
-        .map((location) => (location as any).district?.trim()) // використовуємо district
-        .filter((item): item is string => Boolean(item)),
-    ),
-  ];
+  const primaryCategory = org.categories[0];
+  const regions = resolveOrganizationDistricts(org.locations);
   const workingHours = org.workingHours?.trim();
+  const streetAddress = org.locations[0]?.street?.trim() ?? '';
 
   return {
     id: org.id,
@@ -55,10 +52,13 @@ export function mapOrganizationToCompany(org: CatalogOrganization): Company {
     shortDescription: org.description ?? '',
     rating: 0,
     category: formatCategories(org.categories),
+    categoryId: primaryCategory?.id ?? null,
+    primaryCategoryName: primaryCategory?.name ?? '',
     status: mapOrganizationStatus(org.status),
     workingHours: workingHours || undefined,
     regions,
     primaryAddress: addresses[0] ?? '',
+    streetAddress: streetAddress || addresses[0]?.split(',')[0]?.trim() || '',
     addresses,
     contacts: {
       website,

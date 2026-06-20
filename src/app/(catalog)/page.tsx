@@ -3,7 +3,7 @@ import { fetchCategories } from '@/lib/catalog-api/client';
 import { getCompanies } from '@/lib/companies/getCompanies';
 
 export default async function HomePage() {
-  const [organizations, categories] = await Promise.all([
+  const [{ organizations, hasMore }, categories] = await Promise.all([
     getCompanies(),
     fetchCategories(),
   ]);
@@ -11,6 +11,7 @@ export default async function HomePage() {
   return (
     <CatalogHomeClient
       initialOrganizations={organizations}
+      initialHasMore={hasMore}
       categories={categories}
     />
   );
