@@ -24,50 +24,65 @@ const SearchArrowIcon = () => (
   </svg>
 );
 
+type HeaderSearchProps = {
+  search: string;
+  onSearchChange: (value: string) => void;
+};
+
+function HeaderSearch({ search, onSearchChange }: HeaderSearchProps) {
+  return (
+    <div className="flex w-full max-w-[640px] overflow-hidden rounded-lg border border-black">
+      <span className="inline-flex shrink-0 items-center bg-black px-3 py-2.5 text-xs font-bold text-white sm:px-4 sm:text-sm md:px-5">
+        {CITY_NAME}
+      </span>
+
+      <label className="flex min-w-0 flex-1 items-center gap-2 bg-white px-3 py-2.5 sm:gap-3 sm:px-4">
+        <span className="sr-only">Пошук організацій</span>
+        <input
+          type="search"
+          name="search"
+          id="search"
+          autoComplete="off"
+          value={search}
+          onChange={(event) => onSearchChange(event.target.value)}
+          placeholder="Введіть свій запит"
+          className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-[#6b6b6b]"
+        />
+        <span className="shrink-0 text-[#6b6b6b]">
+          <SearchArrowIcon />
+        </span>
+      </label>
+    </div>
+  );
+}
+
 export function SiteHeader() {
   const { search, setSearch } = useCatalogSearch();
 
   return (
     <header className="border-b border-black/10 bg-white">
-      <div className="mx-auto flex h-[92px] max-w-[1440px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-        <Link
-          href={routes.home}
-          className="inline-flex shrink-0 items-center rounded-lg bg-black px-5 py-2.5 text-sm lowercase text-white transition hover:opacity-80"
-        >
-          logo
-        </Link>
+      <div className="mx-auto max-w-[1440px] px-4 py-3 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-3 md:h-[92px] md:flex-row md:items-center md:justify-between md:gap-6 md:py-0">
+          <div className="flex items-center justify-between gap-3 md:contents">
+            <Link
+              href={routes.home}
+              className="inline-flex shrink-0 items-center rounded-lg bg-black px-4 py-2 text-sm lowercase text-white transition hover:opacity-80 sm:px-5 sm:py-2.5"
+            >
+              logo
+            </Link>
 
-        <div className="flex min-w-0 flex-1 justify-center px-2">
-          <div className="flex w-full max-w-[640px] overflow-hidden rounded-lg border border-black">
-            <span className="inline-flex shrink-0 items-center bg-black px-4 py-2.5 text-sm font-bold text-white sm:px-5">
-              {CITY_NAME}
-            </span>
+            <Link
+              href={routes.addCompany}
+              className="inline-flex shrink-0 items-center rounded-lg bg-black px-3 py-2 text-xs text-white transition hover:opacity-80 sm:px-5 sm:py-2.5 sm:text-sm md:order-3"
+            >
+              Додати організацію
+            </Link>
+          </div>
 
-            <label className="flex min-w-0 flex-1 items-center gap-3 bg-white px-4 py-2.5">
-              <span className="sr-only">Пошук організацій</span>
-              <input
-                type="search"
-                name="search"
-                id="search"
-                autoComplete="off"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Введіть свій запит"
-                className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-[#6b6b6b]"
-              />
-              <span className="shrink-0 text-[#6b6b6b]">
-                <SearchArrowIcon />
-              </span>
-            </label>
+          <div className="w-full min-w-0 md:flex md:flex-1 md:justify-center md:px-2">
+            <HeaderSearch search={search} onSearchChange={setSearch} />
           </div>
         </div>
-
-        <Link
-          href={routes.addCompany}
-          className="inline-flex shrink-0 items-center rounded-lg bg-black px-4 py-2.5 text-sm text-white transition hover:opacity-80 sm:px-5"
-        >
-          Додати організацію
-        </Link>
       </div>
     </header>
   );
