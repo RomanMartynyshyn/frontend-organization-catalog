@@ -1,9 +1,14 @@
 import { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { SiteHeader } from '@/components/layout/SiteHeader';
-import { CatalogSearchProvider } from '@/contexts/CatalogSearchContext';
-import { APP_DESCRIPTION, APP_NAME, SERVER_URL } from '@/lib/constants';
+import {
+  APP_DESCRIPTION,
+  APP_NAME,
+  PAGE_CONTAINER_CLASS,
+  SERVER_URL,
+} from '@/lib/constants';
 
 export const metadata: Metadata = {
   title: {
@@ -20,14 +25,14 @@ export default function CatalogLayout({
   children: React.ReactNode;
 }) {
   return (
-    <CatalogSearchProvider>
-      <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col">
+      <Suspense fallback={<div className="border-b border-black/10 bg-white py-3" aria-hidden />}>
         <SiteHeader />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
-          {children}
-        </main>
-        <SiteFooter />
-      </div>
-    </CatalogSearchProvider>
+      </Suspense>
+      <main className={`${PAGE_CONTAINER_CLASS} flex-1 py-8`}>
+        {children}
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

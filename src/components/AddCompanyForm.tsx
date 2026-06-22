@@ -5,6 +5,7 @@ import { useState, type ComponentProps } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { fetchCategories } from '@/lib/catalog-api/client';
+import { organizationsQueryKeys } from '@/lib/catalog-api/organizationsQuery';
 import type {
   ApiErrorResponse,
   CatalogOrganization,
@@ -84,7 +85,9 @@ export default function AddCompanyForm() {
       setLatitude('');
       setLongitude('');
 
-      await queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      await queryClient.invalidateQueries({
+        queryKey: organizationsQueryKeys.all,
+      });
     },
   });
 

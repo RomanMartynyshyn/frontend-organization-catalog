@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslation } from 'react-i18next';
 
 import { routes } from '@/config/routes';
 import { ReviewForm } from '@/components/company/ReviewForm';
@@ -39,8 +38,6 @@ export default function CompanyPageClient({
   avgRating,
   companyReviews,
 }: Props) {
-  const { t } = useTranslation();
-
   return (
     <article className="space-y-8">
       <div>
@@ -51,7 +48,7 @@ export default function CompanyPageClient({
             'px-0 text-black',
           )}
         >
-          {t('companyPage.back')}
+          ← На головну
         </Link>
       </div>
 
@@ -99,14 +96,14 @@ export default function CompanyPageClient({
                   'border border-black bg-white text-black transition-colors hover:bg-black hover:text-white',
                 )}
               >
-                {t('companyPage.addReviewButton')}
+                Залишити відгук
               </Link>
             </div>
 
             {/* DESCRIPTION */}
             <div className="space-y-3 pt-2">
               <h2 className="text-xl font-semibold">
-                {t('companyPage.sections.description')}
+                Опис
               </h2>
 
               <p className="text-muted leading-relaxed">
@@ -117,7 +114,7 @@ export default function CompanyPageClient({
             {/* BRANCHES */}
             <div className="space-y-3 pt-2">
               <h2 className="text-xl font-semibold">
-                {t('companyPage.sections.branches')}
+                Адреси філій
               </h2>
 
               <div className="flex flex-col gap-2 text-sm text-gray-600">
@@ -133,7 +130,7 @@ export default function CompanyPageClient({
             {/* CONTACTS (SVG НЕ ТРОГАВ — ЗАЛИШЕНО ЯК Є) */}
             <div className="space-y-3 pt-2">
               <h2 className="text-xl font-semibold">
-                {t('companyPage.sections.contacts')}
+                Контакти
               </h2>
 
               <div className="flex flex-col gap-3 text-sm text-gray-600">
@@ -296,7 +293,7 @@ export default function CompanyPageClient({
             {/* REVIEWS */}
             <div id="review-form" className="scroll-mt-24 space-y-3 pt-4">
               <h2 className="text-xl font-semibold">
-                {t('companyPage.sections.reviews')}
+                Відгуки
               </h2>
 
               <div className="flex flex-col gap-3">
@@ -334,7 +331,7 @@ export default function CompanyPageClient({
             {/* FORM */}
             <div className="space-y-3 pt-4">
               <h2 className="text-xl font-semibold">
-                {t('companyPage.sections.addReview')}
+                Додати відгук
               </h2>
 
               <ReviewForm />

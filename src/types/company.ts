@@ -24,6 +24,10 @@ export type Company = {
   };
 };
 
+export type CompanyListItem = Company & {
+  listKey: string;
+};
+
 export const statusLabels = {
   active: 'Активна',
   inactive: 'Неактивна',

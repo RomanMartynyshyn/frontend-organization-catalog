@@ -74,6 +74,7 @@ export type FetchOrganizationsParams = {
   districtIds?: number[];
   limit?: number;
   offset?: number;
+  search?: string;
 };
 
 export type PaginatedOrganizations = {

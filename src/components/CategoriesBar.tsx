@@ -1,10 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
-import type { CatalogCategory } from '@/types/catalog-api';
-import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
+import { useCallback, useEffect, useState } from 'react';
 
+import { CategoryCard } from '@/components/CategoryCard';
+import type { CatalogCategory } from '@/types/catalog-api';
+
+const SLIDE_WIDTH = 268;
+const SLIDE_GAP = 16;
+
+type CategoriesLayout = 'static' | 'scroll' | 'loop';
 
 type CategoriesBarProps = {
   categories: CatalogCategory[];
@@ -12,116 +18,258 @@ type CategoriesBarProps = {
   onSelect: (categoryId: string | null) => void;
 };
 
+function getHorizontalPadding(): number {
+  return window.matchMedia('(min-width: 640px)').matches ? 48 : 32;
+}
+
+function getContentWidth(slideCount: number): number {
+  if (slideCount === 0) {
+    return 0;
+  }
+
+  return slideCount * (SLIDE_WIDTH + SLIDE_GAP);
+}
+
+function getCategoriesLayout(slideCount: number): CategoriesLayout {
+  if (slideCount <= 1) {
+    return 'static';
+  }
+
+  const viewportWidth = window.innerWidth;
+  const paddingX = getHorizontalPadding();
+  const contentWidth = getContentWidth(slideCount);
+  const availableWidth = viewportWidth - paddingX;
+
+  if (contentWidth <= availableWidth) {
+    return 'static';
+  }
+
+  const slideStride = SLIDE_WIDTH + SLIDE_GAP;
+  const visibleSlides = availableWidth / slideStride;
+  const minSlidesForLoop = Math.ceil(visibleSlides) + 2;
+  const hasEnoughContentForLoop =
+    slideCount >= minSlidesForLoop && contentWidth >= availableWidth * 1.5;
+
+  return hasEnoughContentForLoop ? 'loop' : 'scroll';
+}
+
+function useCategoriesLayout(slideCount: number): CategoriesLayout {
+  const [layout, setLayout] = useState<CategoriesLayout>('static');
+
+  useEffect(() => {
+    const update = () => {
+      setLayout(getCategoriesLayout(slideCount));
+    };
+
+    update();
+    window.addEventListener('resize', update);
+
+    return () => {
+      window.removeEventListener('resize', update);
+    };
+  }, [slideCount]);
+
+  return layout;
+}
+
+type CategorySlidesProps = {
+  categories: CatalogCategory[];
+  activeCategoryId: string | null;
+  onSelect: (id: string) => void;
+  slideClassName?: string;
+};
+
+function CategorySlides({
+  categories,
+  activeCategoryId,
+  onSelect,
+  slideClassName = '',
+}: CategorySlidesProps) {
+  return (
+    <>
+      {categories.map((category) => {
+        const id = String(category.id);
+
+        return (
+          <div
+            key={id}
+            className={`min-w-0 shrink-0 grow-0 basis-[268px] ${slideClassName}`.trim()}
+          >
+            <CategoryCard
+              category={category}
+              isActive={activeCategoryId === id}
+              onSelect={onSelect}
+            />
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+type CategoriesCarouselProps = {
+  categories: CatalogCategory[];
+  activeCategoryId: string | null;
+  onSelect: (id: string) => void;
+  loop: boolean;
+};
+
+function CategoriesCarousel({
+  categories,
+  activeCategoryId,
+  onSelect,
+  loop,
+}: CategoriesCarouselProps) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: 'start',
+    containScroll: loop ? false : 'trimSnaps',
+    dragFree: false,
+    loop,
+    slidesToScroll: 1,
+  });
+
+  const scrollPrev = useCallback(() => {
+    emblaApi?.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    emblaApi?.scrollNext();
+  }, [emblaApi]);
+
+  useEffect(() => {
+    emblaApi?.reInit({
+      loop,
+      containScroll: loop ? false : 'trimSnaps',
+    });
+  }, [categories, emblaApi, loop]);
+
+  return (
+    <>
+      <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2">
+        <div
+          ref={emblaRef}
+          className="overflow-hidden px-4 pb-2 sm:px-6"
+        >
+          <div className="flex touch-pan-y">
+            <CategorySlides
+              categories={categories}
+              activeCategoryId={activeCategoryId}
+              onSelect={onSelect}
+              slideClassName="mr-4"
+            />
+          </div>
+        </div>
+      </div>
+
+      <CarouselArrows onPrev={scrollPrev} onNext={scrollNext} />
+    </>
+  );
+}
+
+type CategoriesStaticProps = {
+  categories: CatalogCategory[];
+  activeCategoryId: string | null;
+  onSelect: (id: string) => void;
+};
+
+function CategoriesStatic({
+  categories,
+  activeCategoryId,
+  onSelect,
+}: CategoriesStaticProps) {
+  return (
+    <>
+      <div className="relative left-1/2 w-screen max-w-[100vw] -translate-x-1/2">
+        <div className="flex justify-center gap-4 px-4 pb-2 sm:px-6">
+          <CategorySlides
+            categories={categories}
+            activeCategoryId={activeCategoryId}
+            onSelect={onSelect}
+          />
+        </div>
+      </div>
+
+      <CarouselArrows disabled />
+    </>
+  );
+}
+
+type CarouselArrowsProps = {
+  onPrev?: () => void;
+  onNext?: () => void;
+  disabled?: boolean;
+};
+
+function CarouselArrows({ onPrev, onNext, disabled = false }: CarouselArrowsProps) {
+  return (
+    <div className="flex w-full justify-between">
+      <button
+        type="button"
+        onClick={onPrev}
+        disabled={disabled}
+        className="transition hover:opacity-70 disabled:opacity-30"
+        aria-label="Прокрутити категорії ліворуч"
+      >
+        <Image
+          src="/assets/icons/arrow_circle_left.svg"
+          alt=""
+          width={32}
+          height={32}
+        />
+      </button>
+
+      <button
+        type="button"
+        onClick={onNext}
+        disabled={disabled}
+        className="transition hover:opacity-70 disabled:opacity-30"
+        aria-label="Прокрутити категорії праворуч"
+      >
+        <Image
+          src="/assets/icons/arrow_circle_right.svg"
+          alt=""
+          width={32}
+          height={32}
+        />
+      </button>
+    </div>
+  );
+}
+
 export function CategoriesBar({
   categories,
   activeCategoryId,
   onSelect,
 }: CategoriesBarProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
+  const layout = useCategoriesLayout(categories.length);
 
-  const updateScrollState = () => {
-    const container = scrollRef.current;
-    if (!container) return;
+  const handleCategorySelect = useCallback(
+    (id: string) => {
+      onSelect(activeCategoryId === id ? null : id);
+    },
+    [activeCategoryId, onSelect],
+  );
 
-    setCanScrollLeft(container.scrollLeft > 0);
-    setCanScrollRight(
-      container.scrollLeft + container.clientWidth < container.scrollWidth - 1,
-    );
-  };
-
-  const scrollBy = (direction: 'left' | 'right') => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const offset = direction === 'left' ? -280 : 280;
-    container.scrollBy({ left: offset, behavior: 'smooth' });
-  };
-
-  const handleCategoryClick = (id: string) => {
-    onSelect(activeCategoryId === id ? null : id);
-  };
-
-  useEffect(() => {
-    updateScrollState();
-  }, [categories]);
-
-  if (!categories.length) return null;
+  if (!categories.length) {
+    return null;
+  }
 
   return (
-    <section className="relative left-1/2 w-screen -translate-x-1/2">
-      <div className="space-y-4 px-4">
-        {/* Слайдер карточек */}
-        <div
-          ref={scrollRef}
-          onScroll={updateScrollState}
-          className="no-scrollbar flex gap-4 overflow-x-auto pb-2"
-        >
-          {categories.map((category) => {
-            const id = String(category.id);
-            const isActive = activeCategoryId === id;
-
-            return (
-              <div
-                key={id}
-                onClick={() => handleCategoryClick(id)}
-                className={`flex h-[132px] w-[268px] flex-shrink-0 flex-col justify-between rounded-[20px] p-6 transition-colors duration-300 ${
-                  isActive
-                    ? 'bg-[#747474]'
-                    : 'bg-[#D0D0D0] hover:cursor-pointer'
-                }`}
-              >
-               
-                  <Image
-                    src={getCategoryIconSrc(category.id)}
-                    alt={category.name}
-                    width={24}
-                    height={24}
-                    className="h-6 w-6"
-                  />
-                
-                <p className="text-base leading-6 font-normal text-black">
-                  {category.name}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Стрелки */}
-        <div className="mt-4 flex justify-between px-[11%]">
-          <button
-            type="button"
-            onClick={() => scrollBy('left')}
-            disabled={!canScrollLeft}
-            className="transition hover:opacity-70 disabled:opacity-30"
-            aria-label="Прокрутити категорії ліворуч"
-          >
-            <Image
-              src="/assets/icons/arrow_circle_left.svg"
-              alt="Left"
-              width={32}
-              height={32}
-            />
-          </button>
-
-          <button
-            type="button"
-            onClick={() => scrollBy('right')}
-            disabled={!canScrollRight}
-            className="transition hover:opacity-70 disabled:opacity-30"
-            aria-label="Прокрутити категорії праворуч"
-          >
-            <Image
-              src="/assets/icons/arrow_circle_right.svg"
-              alt="Right"
-              width={32}
-              height={32}
-            />
-          </button>
-        </div>
-      </div>
+    <section className="space-y-4">
+      {layout === 'static' ? (
+        <CategoriesStatic
+          categories={categories}
+          activeCategoryId={activeCategoryId}
+          onSelect={handleCategorySelect}
+        />
+      ) : (
+        <CategoriesCarousel
+          categories={categories}
+          activeCategoryId={activeCategoryId}
+          onSelect={handleCategorySelect}
+          loop={layout === 'loop'}
+        />
+      )}
     </section>
   );
 }

@@ -48,14 +48,58 @@ function collectDistricts(locations: CatalogLocation[]): string[] {
   return [...districts];
 }
 
-export function mapOrganizationToCompany(org: CatalogOrganization): Company {
+export type MapOrganizationOptions = {
+  activeDistrictNames?: string[];
+};
+
+function pickDisplayLocation(
+  locations: CatalogLocation[],
+  activeDistrictNames?: string[],
+): CatalogLocation | undefined {
+  if (!locations.length) {
+    return undefined;
+  }
+
+  if (activeDistrictNames?.length) {
+    const activeDistricts = new Set(
+      activeDistrictNames.map((name) => name.trim()).filter(Boolean),
+    );
+    const matchingLocation = locations.find(
+      (location) =>
+        location.district?.trim() &&
+        activeDistricts.has(location.district.trim()),
+    );
+
+    if (matchingLocation) {
+      return matchingLocation;
+    }
+  }
+
+  return locations[0];
+}
+
+export function mapOrganizationToCompany(
+  org: CatalogOrganization,
+  options?: MapOrganizationOptions,
+): Company {
   const website = org.websiteUrl ? stripWebsiteProtocol(org.websiteUrl) : '';
   const social = org.sociaLinks ?? {};
   const addresses = org.locations.map(formatLocation);
   const primaryCategory = org.categories[0];
-  const regions = collectDistricts(org.locations);
+  const displayLocation = pickDisplayLocation(
+    org.locations,
+    options?.activeDistrictNames,
+  );
+  const regions = collectDistricts(
+    options?.activeDistrictNames?.length && displayLocation
+      ? [displayLocation]
+      : org.locations,
+  );
   const workingHours = org.workingHours?.trim();
-  const streetAddress = org.locations[0]?.street?.trim() ?? '';
+  const formattedDisplayAddress = displayLocation
+    ? formatLocation(displayLocation)
+    : '';
+  const streetAddress = displayLocation?.street?.trim() ?? '';
 
   return {
     id: org.id,
@@ -70,8 +114,12 @@ export function mapOrganizationToCompany(org: CatalogOrganization): Company {
     status: mapOrganizationStatus(org.status),
     workingHours: workingHours || undefined,
     regions,
-    primaryAddress: addresses[0] ?? '',
-    streetAddress: streetAddress || addresses[0]?.split(',')[0]?.trim() || '',
+    primaryAddress: formattedDisplayAddress || addresses[0] || '',
+    streetAddress:
+      streetAddress ||
+      formattedDisplayAddress.split(',')[0]?.trim() ||
+      addresses[0]?.split(',')[0]?.trim() ||
+      '',
     addresses,
     contacts: {
       website,

@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import { cn } from '@/lib/cn';
 import { buttonVariants } from '@/components/ui/button';
 import { RatingStarsInput } from '@/components/ui/RatingStars';
 
 export const ReviewForm = () => {
-  const { t } = useTranslation();
   const [rating, setRating] = useState('');
 
   return (
@@ -19,7 +17,7 @@ export const ReviewForm = () => {
           name="name"
           id="review-name"
           autoComplete="name"
-          placeholder={t('reviewForm.namePlaceholder')}
+          placeholder="Ваше ім'я"
           className="rounded-lg border px-3 py-2 text-sm"
         />
 
@@ -27,7 +25,7 @@ export const ReviewForm = () => {
           name="text"
           id="review-text"
           autoComplete="off"
-          placeholder={t('reviewForm.textPlaceholder')}
+          placeholder="Уведіть ваш відгук..."
           className="min-h-[100px] rounded-lg border px-3 py-2 text-sm"
         />
 
@@ -46,7 +44,7 @@ export const ReviewForm = () => {
               'bg-black text-white transition-colors hover:bg-neutral-800',
             )}
           >
-            {t('reviewForm.submit')}
+            Надіслати
           </button>
         </div>
       </div>

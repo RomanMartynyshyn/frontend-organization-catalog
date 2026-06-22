@@ -1,12 +1,10 @@
 import { CatalogHomeClient } from '@/app/(catalog)/CatalogHomeClient';
-import {
-  type CatalogSearchQuery,
-} from '@/lib/catalogSearchParams';
+import { getActiveDistrictNames } from '@/lib/catalog-api/activeDistrictNames';
+import { fetchCategories, fetchDistricts } from '@/lib/catalog-api/client';
+import { getCompanies } from '@/lib/companies/getCompanies';
+import { type CatalogFiltersQuery } from '@/lib/catalogSearchParams';
 import { catalogSearchParsers } from '@/lib/catalogSearchParsers.server';
 import { catalogSearchUrlKeys } from '@/lib/catalogSearchUrlKeys';
-import { fetchCategories } from '@/lib/catalog-api/client';
-import { getCompanies } from '@/lib/companies/getCompanies';
-import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
 import { createLoader } from 'nuqs/server';
 
 type HomePageProps = {
@@ -17,7 +15,7 @@ const loadCatalogSearchParams = createLoader(catalogSearchParsers, {
   urlKeys: catalogSearchUrlKeys,
 });
 
-function parseCategoryId(categoryId: CatalogSearchQuery['categoryId']): number | undefined {
+function parseCategoryId(categoryId: CatalogFiltersQuery['categoryId']): number | undefined {
   if (!categoryId) {
     return undefined;
   }
@@ -32,24 +30,33 @@ function parseCategoryId(categoryId: CatalogSearchQuery['categoryId']): number |
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const initialQuery = await loadCatalogSearchParams(searchParams);
-  const categoryId = parseCategoryId(initialQuery.categoryId);
-  const limit = Math.max(initialQuery.page, 1) * ORGANIZATIONS_PAGE_SIZE;
-  const [{ organizations, hasMore }, categories] = await Promise.all([
-    getCompanies({
-      categoryId,
-      districtIds: initialQuery.districtIds,
-      limit,
-    }),
+  const initialFilters = await loadCatalogSearchParams(searchParams);
+  const categoryId = parseCategoryId(initialFilters.categoryId);
+
+  const [districts, categories] = await Promise.all([
+    fetchDistricts(),
     fetchCategories(),
   ]);
 
+  const activeDistrictNames = getActiveDistrictNames(
+    districts,
+    initialFilters.districtIds,
+  );
+
+  const { organizations, hasMore } = await getCompanies({
+    categoryId,
+    districtIds: initialFilters.districtIds,
+    search: initialFilters.search.trim() || undefined,
+    activeDistrictNames,
+  });
+
   return (
     <CatalogHomeClient
-      initialQuery={initialQuery}
+      initialFilters={initialFilters}
       initialOrganizations={organizations}
       initialHasMore={hasMore}
       categories={categories}
+      districts={districts}
     />
   );
 }
