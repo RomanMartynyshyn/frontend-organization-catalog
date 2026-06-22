@@ -1,16 +1,19 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 import { CompanyListCard } from '@/components/catalog/CompanyListCard';
 import { Button } from '@/components/ui/button';
-import type { Company } from '@/types/company';
+import type { CompanyListItem } from '@/types/company';
 
 type OrganizationsListProps = {
-  data: Company[];
+  data: CompanyListItem[];
   isLoading?: boolean;
   hasMore?: boolean;
   isLoadingMore?: boolean;
   onLoadMore?: () => void;
   alignWithFilters?: boolean;
+  scrollToTopKey?: string;
 };
 
 export function OrganizationsList({
@@ -20,7 +23,18 @@ export function OrganizationsList({
   isLoadingMore = false,
   onLoadMore,
   alignWithFilters = false,
+  scrollToTopKey,
 }: OrganizationsListProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!scrollToTopKey) {
+      return;
+    }
+
+    scrollContainerRef.current?.scrollTo({ top: 0 });
+  }, [scrollToTopKey]);
+
   return (
     <section className="flex min-w-0 flex-1 flex-col lg:h-full">
       {alignWithFilters && (
@@ -28,8 +42,11 @@ export function OrganizationsList({
       )}
 
       <div className="flex min-h-[280px] max-h-[min(55vh,480px)] flex-col rounded-2xl bg-[#d9d9d9] px-4 py-4 lg:max-h-none lg:min-h-0 lg:flex-1">
-        <div className="min-h-0 flex-1 overflow-y-auto pr-8 sm:pr-10">
-          {isLoading ? (
+        <div
+          ref={scrollContainerRef}
+          className="min-h-0 flex-1 overflow-y-auto pr-8 sm:pr-10"
+        >
+          {isLoading && !data.length ? (
             <div className="flex min-h-[200px] items-center justify-center text-gray-600">
               Завантаження…
             </div>
@@ -40,7 +57,7 @@ export function OrganizationsList({
           ) : (
             <div className="flex flex-col gap-3">
               {data.map((company) => (
-                <CompanyListCard key={company.id} company={company} />
+                <CompanyListCard key={company.listKey} company={company} />
               ))}
 
               {hasMore && onLoadMore ? (

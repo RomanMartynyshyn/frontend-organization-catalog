@@ -1,5 +1,5 @@
 export const catalogSearchUrlKeys = {
   categoryId: 'categoryId',
   districts: 'districtId',
-  page: 'page',
+  search: 'search',
 } as const;

@@ -107,6 +107,7 @@ export async function fetchOrganizations(
     districtIds = [],
     limit = ORGANIZATIONS_PAGE_SIZE,
     offset = 0,
+    search,
   } = params;
 
   const searchParams = new URLSearchParams({
@@ -120,6 +121,12 @@ export async function fetchOrganizations(
 
   for (const districtId of districtIds) {
     searchParams.append('districtId', districtId.toString());
+  }
+
+  const normalizedSearch = search?.trim();
+
+  if (normalizedSearch) {
+    searchParams.set('search', normalizedSearch);
   }
 
   const { data } = await catalogFetch<CatalogOrganization[]>(

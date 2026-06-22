@@ -80,6 +80,7 @@ export async function GET(request: NextRequest) {
   const districtParams = request.nextUrl.searchParams.getAll('districtId');
   const limitParam = request.nextUrl.searchParams.get('limit');
   const offsetParam = request.nextUrl.searchParams.get('offset');
+  const searchParam = request.nextUrl.searchParams.get('search')?.trim();
 
   let categoryId: number | undefined;
 
@@ -112,6 +113,7 @@ export async function GET(request: NextRequest) {
       districtIds: districtIds,
       limit,
       offset,
+      search: searchParam || undefined,
     });
     return NextResponse.json(result);
   } catch (error) {

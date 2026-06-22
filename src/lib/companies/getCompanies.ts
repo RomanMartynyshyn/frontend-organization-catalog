@@ -1,20 +1,69 @@
 import { fetchOrganizations } from '@/lib/catalog-api/client';
-import { mapOrganizationToCompany } from '@/lib/catalog-api/mapToCompany';
+import { getChunkPagination } from '@/lib/catalog-api/organizationsPagination';
+import { toCompanyListItems } from '@/lib/companies/companyListItems';
+import {
+  mapOrganizationToCompany,
+  type MapOrganizationOptions,
+} from '@/lib/catalog-api/mapToCompany';
 import type { FetchOrganizationsParams } from '@/types/catalog-api';
-import type { Company } from '@/types/company';
+import type { CompanyListItem } from '@/types/company';
 
 export type CompaniesPage = {
-  organizations: Company[];
+  organizations: CompanyListItem[];
   hasMore: boolean;
 };
 
+export type GetCompaniesParams = FetchOrganizationsParams & MapOrganizationOptions;
+
 export async function getCompanies(
-  params: FetchOrganizationsParams = {},
+  params: GetCompaniesParams = {},
 ): Promise<CompaniesPage> {
-  const { items, hasMore } = await fetchOrganizations(params);
+  const { activeDistrictNames, ...fetchParams } = params;
+  const { items, hasMore } = await fetchOrganizations(fetchParams);
 
   return {
-    organizations: items.map(mapOrganizationToCompany),
+    organizations: toCompanyListItems(
+      items.map((item) =>
+        mapOrganizationToCompany(item, { activeDistrictNames }),
+      ),
+      1,
+    ),
+    hasMore,
+  };
+}
+
+export async function getCompaniesUpToPage(
+  params: GetCompaniesParams & { page: number },
+): Promise<CompaniesPage> {
+  const { page, activeDistrictNames, ...fetchParams } = params;
+  const organizations: CompanyListItem[] = [];
+  let hasMore = false;
+
+  for (let pageNumber = 1; pageNumber <= page; pageNumber += 1) {
+    const { limit, offset } = getChunkPagination(pageNumber);
+    const { items, hasMore: chunkHasMore } = await fetchOrganizations({
+      ...fetchParams,
+      limit,
+      offset,
+    });
+
+    organizations.push(
+      ...toCompanyListItems(
+        items.map((item) =>
+          mapOrganizationToCompany(item, { activeDistrictNames }),
+        ),
+        pageNumber,
+      ),
+    );
+    hasMore = chunkHasMore;
+
+    if (!chunkHasMore) {
+      break;
+    }
+  }
+
+  return {
+    organizations,
     hasMore,
   };
 }
