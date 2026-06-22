@@ -9,7 +9,7 @@ export async function GET() {
     const districts = await fetchDistricts();
     return NextResponse.json(districts);
   } catch (error) {
-    console.error('[GET /api/organizations/districts]', error);
+    console.error('[GET /api/districts]', error);
     return NextResponse.json(
       { message: 'Failed to fetch districts' },
       { status: 502 },

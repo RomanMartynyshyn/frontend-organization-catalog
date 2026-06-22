@@ -1,33 +1,35 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import {CatalogDistrict} from "@/types/catalog-api";
 
 type FiltersPanelProps = {
-  districts: readonly string[];
-  selectedDistricts: string[];
-  onSelectedDistrictsChange: (districts: string[]) => void;
+  districts: readonly CatalogDistrict[];
+  selectedDistrictIds: Number[];
+  onSelectedDistrictsChange: (districtIds: Number[]) => void;
 };
 
 export function FiltersPanel({
   districts,
-  selectedDistricts,
+  selectedDistrictIds,
   onSelectedDistrictsChange,
 }: FiltersPanelProps) {
   const [isDistrictOpen, setIsDistrictOpen] = useState(true);
   const [pendingDistricts, setPendingDistricts] =
-    useState<string[]>(selectedDistricts);
+    useState<Number[]>(selectedDistrictIds);
 
   useEffect(() => {
     setTimeout(() => {
-      setPendingDistricts(selectedDistricts);
+      setPendingDistricts(selectedDistrictIds);
     }, 0);
-  }, [selectedDistricts]);
+  }, [selectedDistrictIds]);
 
-  const toggleDistrict = (district: string) => {
+  const toggleDistrict = (district: CatalogDistrict) => {
+    const districtId = district.districtId
     setPendingDistricts((current) =>
-      current.includes(district)
-        ? current.filter((item) => item !== district)
-        : [...current, district],
+      current.includes(districtId)
+        ? current.filter((item) => item !== districtId)
+        : [...current, districtId],
     );
   };
 
@@ -65,16 +67,16 @@ export function FiltersPanel({
                 {districts.length ? (
                   districts.map((district) => (
                     <label
-                      key={district}
+                      key={district.districtId}
                       className="flex cursor-pointer items-center gap-2.5 text-sm text-black"
                     >
                       <input
                         type="checkbox"
-                        checked={pendingDistricts.includes(district)}
+                        checked={pendingDistricts.includes(district.districtId)}
                         onChange={() => toggleDistrict(district)}
                         className="h-4 w-4 shrink-0 rounded-sm border border-black accent-black"
                       />
-                      <span>{district}</span>
+                      <span>{district.name}</span>
                     </label>
                   ))
                 ) : (

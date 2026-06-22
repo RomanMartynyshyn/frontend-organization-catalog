@@ -1,6 +1,6 @@
 import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
-import type {
-  CatalogCategory,
+import {
+  CatalogCategory, CatalogDistrict,
   CatalogOrganization,
   CreateOrganizationPayload,
   FetchOrganizationsParams,
@@ -83,8 +83,8 @@ export async function fetchCategories(): Promise<CatalogCategory[]> {
   return data;
 }
 
-export async function fetchDistricts(): Promise<string[]> {
-  const { data } = await catalogFetch<string[]>('/api/organizations/districts');
+export async function fetchDistricts(): Promise<CatalogDistrict[]> {
+  const { data } = await catalogFetch<CatalogDistrict[]>('/api/districts');
   return data ?? [];
 }
 
@@ -104,7 +104,7 @@ export async function fetchOrganizations(
 ): Promise<PaginatedOrganizations> {
   const {
     categoryId,
-    districts = [],
+    districtIds = [],
     limit = ORGANIZATIONS_PAGE_SIZE,
     offset = 0,
   } = params;
@@ -115,11 +115,11 @@ export async function fetchOrganizations(
   });
 
   if (categoryId !== undefined) {
-    searchParams.set('category_id', String(categoryId));
+    searchParams.set('categoryId', String(categoryId));
   }
 
-  for (const district of districts) {
-    searchParams.append('district', district);
+  for (const districtId of districtIds) {
+    searchParams.append('districtId', districtId.toString());
   }
 
   const { data } = await catalogFetch<CatalogOrganization[]>(
