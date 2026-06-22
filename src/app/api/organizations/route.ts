@@ -76,8 +76,8 @@ function parsePositiveInt(
 }
 
 export async function GET(request: NextRequest) {
-  const categoryIdParam = request.nextUrl.searchParams.get('category_id');
-  const districtParams = request.nextUrl.searchParams.getAll('district');
+  const categoryIdParam = request.nextUrl.searchParams.get('categoryId');
+  const districtParams = request.nextUrl.searchParams.getAll('districtId');
   const limitParam = request.nextUrl.searchParams.get('limit');
   const offsetParam = request.nextUrl.searchParams.get('offset');
 
@@ -88,11 +88,13 @@ export async function GET(request: NextRequest) {
 
     if (Number.isNaN(categoryId)) {
       return NextResponse.json(
-        { message: 'Invalid category_id' },
+        { message: 'Invalid categoryId' },
         { status: 400 },
       );
     }
   }
+
+  const districtIds = districtParams.map(Number);
 
   const limit = parsePositiveInt(limitParam, ORGANIZATIONS_PAGE_SIZE);
   const offset = parsePositiveInt(offsetParam, 0);
@@ -107,7 +109,7 @@ export async function GET(request: NextRequest) {
   try {
     const result = await fetchOrganizations({
       categoryId,
-      districts: districtParams,
+      districtIds: districtIds,
       limit,
       offset,
     });

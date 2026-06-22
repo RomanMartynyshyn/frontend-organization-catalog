@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryStates } from 'nuqs';
 
 import { CategoriesBar } from '@/components/CategoriesBar';
 import { FiltersPanel } from '@/components/FiltersPanel';
@@ -8,37 +9,40 @@ import HeroSection from '@/components/HeroSection';
 import { OrganizationsList } from '@/components/OrganizationsList';
 import { SelectedFilters } from '@/components/SelectedFilters';
 import { useCatalogSearch } from '@/contexts/CatalogSearchContext';
+import {
+  serializeCatalogSearchQuery,
+  type CatalogSearchQuery,
+} from '@/lib/catalogSearchParams';
+import { catalogSearchParsers } from '@/lib/catalogSearchParsers';
+import { catalogSearchUrlKeys } from '@/lib/catalogSearchUrlKeys';
 import { mapOrganizationToCompany } from '@/lib/catalog-api/mapToCompany';
 import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
-import type { CatalogCategory, PaginatedOrganizations } from '@/types/catalog-api';
+import type {CatalogCategory, CatalogDistrict, PaginatedOrganizations} from '@/types/catalog-api';
 import type { Company } from '@/types/company';
 
 type CatalogHomeClientProps = {
+  initialQuery: CatalogSearchQuery;
   initialOrganizations: Company[];
   initialHasMore: boolean;
   categories: CatalogCategory[];
 };
 
-type OrganizationQuery = {
-  categoryId: string | null;
-  districts: string[];
-};
+type OrganizationQuery = CatalogSearchQuery;
 
 async function fetchOrganizationsPage(
-  offset: number,
   query: OrganizationQuery,
 ): Promise<PaginatedOrganizations> {
   const params = new URLSearchParams({
-    limit: String(ORGANIZATIONS_PAGE_SIZE),
-    offset: String(offset),
+    limit: String(Math.max(query.page, 1) * ORGANIZATIONS_PAGE_SIZE),
+    offset: '0',
   });
 
   if (query.categoryId !== null) {
-    params.set('category_id', query.categoryId);
+    params.set('categoryId', query.categoryId);
   }
 
-  for (const district of query.districts) {
-    params.append('district', district);
+  for (const districtId of query.districtIds) {
+    params.append('districtId', String(districtId));
   }
 
   const response = await fetch(`/api/organizations?${params.toString()}`);
@@ -50,8 +54,8 @@ async function fetchOrganizationsPage(
   return (await response.json()) as PaginatedOrganizations;
 }
 
-async function fetchDistrictOptions(): Promise<string[]> {
-  const response = await fetch('/api/organizations/districts');
+async function fetchDistrictOptions(): Promise<CatalogDistrict[]> {
+  const response = await fetch('/api/districts');
 
   if (!response.ok) {
     return [];
@@ -63,108 +67,129 @@ async function fetchDistrictOptions(): Promise<string[]> {
     return [];
   }
 
-  return data
-    .map((item) => (typeof item === 'string' ? item.trim() : ''))
-    .filter((item): item is string => Boolean(item));
+  return data;
 }
 
 export function CatalogHomeClient({
+  initialQuery,
   initialOrganizations,
   initialHasMore,
   categories,
 }: CatalogHomeClientProps) {
   const { search, setSearch } = useCatalogSearch();
-  const [organizations, setOrganizations] =
-    useState<Company[]>(initialOrganizations);
+  const [
+    { categoryId: activeCategoryId, districtIds: selectedDistrictIds, page },
+    setCatalogFilters,
+  ] = useQueryStates(catalogSearchParsers, {
+    urlKeys: catalogSearchUrlKeys,
+  });
+  const [organizations, setOrganizations] = useState<Company[]>(initialOrganizations);
   const [hasMore, setHasMore] = useState(initialHasMore);
-  const [nextOffset, setNextOffset] = useState(initialOrganizations.length);
-  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
-  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
-  const [districtOptions, setDistrictOptions] = useState<string[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<CatalogDistrict[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const previousQueryKeyRef = useRef(serializeCatalogSearchQuery(initialQuery));
+  const previousPageRef = useRef(initialQuery.page);
 
   useEffect(() => {
     void fetchDistrictOptions().then(setDistrictOptions);
   }, []);
 
-  const buildQuery = useCallback(
-    (overrides?: Partial<OrganizationQuery>): OrganizationQuery => ({
+  const currentQuery = useMemo<OrganizationQuery>(
+    () => ({
       categoryId: activeCategoryId,
-      districts: selectedDistricts,
-      ...overrides,
+      districtIds: selectedDistrictIds,
+      page,
     }),
-    [activeCategoryId, selectedDistricts],
+    [activeCategoryId, page, selectedDistrictIds],
+  );
+
+  const currentQueryKey = useMemo(
+    () => serializeCatalogSearchQuery(currentQuery),
+    [currentQuery],
   );
 
   const loadOrganizations = useCallback(
-    async (query: OrganizationQuery, offset = 0, append = false) => {
-      const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(
-        offset,
-        query,
-      );
+    async (query: OrganizationQuery) => {
+      const { items, hasMore: nextHasMore } = await fetchOrganizationsPage(query);
       const mapped = items.map(mapOrganizationToCompany);
 
-      setOrganizations((current) => (append ? [...current, ...mapped] : mapped));
+      setOrganizations(mapped);
       setHasMore(nextHasMore);
-      setNextOffset(offset + items.length);
     },
     [],
   );
 
-  const handleSelectedDistrictsChange = useCallback(
-    async (districts: string[]) => {
-      setSelectedDistricts(districts);
-      setIsLoading(true);
+  useEffect(() => {
+    if (previousQueryKeyRef.current === currentQueryKey) {
+      return;
+    }
 
-      try {
-        await loadOrganizations(buildQuery({ districts }), 0, false);
-      } catch (error) {
+    const previousPage = previousPageRef.current;
+
+    previousQueryKeyRef.current = currentQueryKey;
+    previousPageRef.current = currentQuery.page;
+    let isActive = true;
+
+    const isPaginationUpdate = currentQuery.page > previousPage;
+
+    if (isPaginationUpdate) {
+      setIsLoadingMore(true);
+    } else {
+      setIsLoading(true);
+    }
+
+    void loadOrganizations(currentQuery)
+      .catch((error) => {
+        if (!isActive) {
+          return;
+        }
+
         console.error(error);
         setOrganizations([]);
         setHasMore(false);
-        setNextOffset(0);
-      } finally {
-        setIsLoading(false);
-      }
+      })
+      .finally(() => {
+        if (isActive) {
+          setIsLoading(false);
+          setIsLoadingMore(false);
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, [currentQuery, currentQueryKey, loadOrganizations]);
+
+  const handleSelectedDistrictsChange = useCallback(
+    (districtIds: number[]) => {
+      setIsLoading(true);
+
+      void setCatalogFilters({ districtIds, page: 1 });
     },
-    [buildQuery, loadOrganizations],
+    [setCatalogFilters],
   );
 
   const handleCategorySelect = useCallback(
-    async (id: string | null) => {
-      setActiveCategoryId(id);
+    (id: string | null) => {
       setIsLoading(true);
 
-      try {
-        await loadOrganizations(buildQuery({ categoryId: id }), 0, false);
-      } catch (error) {
-        console.error(error);
-        setOrganizations([]);
-        setHasMore(false);
-        setNextOffset(0);
-      } finally {
-        setIsLoading(false);
-      }
+      void setCatalogFilters({ categoryId: id, page: 1 });
     },
-    [buildQuery, loadOrganizations],
+    [setCatalogFilters],
   );
 
-  const handleLoadMore = useCallback(async () => {
+  const handleLoadMore = useCallback(() => {
     if (isLoadingMore || !hasMore) {
       return;
     }
 
     setIsLoadingMore(true);
 
-    try {
-      await loadOrganizations(buildQuery(), nextOffset, true);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoadingMore(false);
-    }
-  }, [buildQuery, hasMore, isLoadingMore, loadOrganizations, nextOffset]);
+    void setCatalogFilters((currentFilters) => ({
+      page: currentFilters.page + 1,
+    }));
+  }, [hasMore, isLoadingMore, setCatalogFilters]);
 
   const filteredOrganizations = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -203,13 +228,15 @@ export function CatalogHomeClient({
       });
     }
 
-    selectedDistricts.forEach((district) => {
+    districtOptions
+      .filter(district => selectedDistrictIds.includes(district.districtId))
+      .forEach((district) => {
       filters.push({
-        id: `district-${district}`,
-        label: district,
+        id: district.districtId.toString(),
+        label: district.name,
         onRemove: () =>
           handleSelectedDistrictsChange(
-            selectedDistricts.filter((item) => item !== district),
+            selectedDistrictIds.filter((item) => item !== district.districtId),
           ),
       });
     });
@@ -231,17 +258,23 @@ export function CatalogHomeClient({
     handleCategorySelect,
     handleSelectedDistrictsChange,
     search,
-    selectedDistricts,
+    selectedDistrictIds,
     setSearch,
+    districtOptions
   ]);
 
   const resetFilters = () => {
     setSearch('');
-    setSelectedDistricts([]);
-    setActiveCategoryId(null);
-    setOrganizations(initialOrganizations);
-    setHasMore(initialHasMore);
-    setNextOffset(initialOrganizations.length);
+
+    if (activeCategoryId !== null || selectedDistrictIds.length > 0) {
+      setIsLoading(true);
+    }
+
+    void setCatalogFilters({
+      categoryId: null,
+      districtIds: [],
+      page: 1,
+    });
   };
 
   return (
@@ -259,7 +292,7 @@ export function CatalogHomeClient({
       <div className="flex flex-col gap-6 lg:min-h-[480px] lg:h-[min(70vh,720px)] lg:flex-row lg:items-stretch">
         <FiltersPanel
           districts={districtOptions}
-          selectedDistricts={selectedDistricts}
+          selectedDistrictIds={selectedDistrictIds}
           onSelectedDistrictsChange={handleSelectedDistrictsChange}
         />
 

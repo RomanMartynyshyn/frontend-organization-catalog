@@ -3,6 +3,11 @@ export type CatalogCategory = {
   name: string;
 };
 
+export type CatalogDistrict = {
+  districtId: number;
+  name: string;
+};
+
 export type CatalogOrganizationCategory = {
   id: number;
   name: string;
@@ -66,7 +71,7 @@ export type CatalogOrganization = {
 
 export type FetchOrganizationsParams = {
   categoryId?: number;
-  districts?: string[];
+  districtIds?: number[];
   limit?: number;
   offset?: number;
 };
