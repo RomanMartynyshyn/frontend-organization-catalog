@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import { getCompanyRating } from '@/lib/companies/getCompanyRating';
 import { mockReviews } from '@/mocks/mockReviews';
 import { getCompanyById } from '@/lib/companies/getCompanyById';
-import CompanyPageClient from './CompanyPageClient';
+// import CompanyPageClient from './CompanyPageClient';
+import CompanyPageClientDraft from './CompanyPageClientDraft';
+
 
 export const metadata:Metadata = {
   title: 'Company Details',
@@ -30,7 +32,7 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
   );
 
   return (
-    <CompanyPageClient
+    <CompanyPageClientDraft
       company={company}
       avgRating={avgRating}
       companyReviews={companyReviews}
