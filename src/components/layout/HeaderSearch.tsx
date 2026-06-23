@@ -38,7 +38,7 @@ export function HeaderSearch({ search, onSearchChange }: HeaderSearchProps) {
           autoComplete="off"
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Введіть свій запит"
+          placeholder="Введіть назву організації"
           className="min-w-0 flex-1 bg-transparent text-sm text-black outline-none placeholder:text-[#6b6b6b]"
         />
         <span className="shrink-0 text-[#6b6b6b]">

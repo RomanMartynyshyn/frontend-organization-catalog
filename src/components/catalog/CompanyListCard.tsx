@@ -2,7 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
+import { Modal } from '@/components/ui/modal';
 import { routes } from '@/config/routes';
 import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
 import type { Company } from '@/types/company';
@@ -65,10 +67,35 @@ function formatWorkingHoursLabel(workingHours: string): string {
   return normalized;
 }
 
+function formatExtraAddressesLabel(count: number): string {
+  const remainder10 = count % 10;
+  const remainder100 = count % 100;
+
+  if (remainder100 >= 11 && remainder100 <= 14) {
+    return `+ ще ${count} адрес`;
+  }
+
+  if (remainder10 === 1) {
+    return `+ ще ${count} адресу`;
+  }
+
+  if (remainder10 >= 2 && remainder10 <= 4) {
+    return `+ ще ${count} адреси`;
+  }
+
+  return `+ ще ${count} адрес`;
+}
+
 export function CompanyListCard({ company }: CompanyListCardProps) {
+  const [isAddressesModalOpen, setIsAddressesModalOpen] = useState(false);
   const categoryLabel = company.primaryCategoryName || company.category.trim();
+  const addresses = company.addresses
+    .map((address) => address.trim())
+    .filter(Boolean);
   const displayAddress =
     company.streetAddress.trim() || company.primaryAddress.trim();
+  const extraAddressCount = Math.max(addresses.length - 1, 0);
+  const hasMoreAddresses = extraAddressCount > 0;
   const workingHoursLabel = company.workingHours
     ? formatWorkingHoursLabel(company.workingHours)
     : '';
@@ -100,10 +127,20 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
             {company.name || '—'}
           </h3>
 
-          {displayAddress ? (
-            <p className="flex items-center gap-1.5 text-sm leading-snug text-black">
+          {displayAddress || addresses.length > 0 ? (
+            <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-snug text-black">
               <LocationIcon />
-              <span>{displayAddress}</span>
+              <span>{displayAddress || addresses[0]}</span>
+              {hasMoreAddresses ? (
+                <button
+                  type="button"
+                  onClick={() => setIsAddressesModalOpen(true)}
+                  className="text-sm leading-snug text-black underline underline-offset-2 transition hover:opacity-70"
+                  aria-haspopup="dialog"
+                >
+                  {formatExtraAddressesLabel(extraAddressCount)}
+                </button>
+              ) : null}
             </p>
           ) : null}
 
@@ -115,6 +152,27 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
           ) : null}
         </div>
       </div>
+
+      <Modal
+        isOpen={isAddressesModalOpen}
+        onClose={() => setIsAddressesModalOpen(false)}
+        className="max-w-md"
+      >
+        <div className="space-y-4">
+          <h2 className="pr-8 text-lg font-bold text-black">
+            {company.name || '—'} — адреси
+          </h2>
+
+          <ul className="max-h-[min(60vh,420px)] space-y-3 overflow-y-auto text-sm text-black">
+            {addresses.map((address, index) => (
+              <li key={`${company.id}-${index}`} className="flex items-start gap-2">
+                <LocationIcon />
+                <span>{address}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Modal>
 
       {hasDescription ? (
         <p className="mt-5 line-clamp-2 text-sm leading-[1.45] text-black">
