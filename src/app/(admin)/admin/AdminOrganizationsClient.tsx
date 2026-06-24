@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { Button } from '@/components/ui/button';
@@ -11,13 +11,16 @@ import {
   adminOrganizationStatusLabels,
   fetchAdminOrganizationsPage,
   updateAdminOrganizationStatus,
+  type AdminOrganizationStatusTab,
 } from '@/lib/admin-api/organizations';
+import { cn } from '@/lib/cn';
 import type { CatalogOrganization } from '@/types/catalog-api';
 
-type AdminStatusTab = keyof typeof adminOrganizationStatusLabels;
-
-const adminOrganizationsQueryKey = (status: AdminStatusTab, offset: number) =>
-  ['admin-organizations', status, offset] as const;
+const adminOrganizationsQueryKey = (
+  status: AdminOrganizationStatusTab,
+  offset: number,
+  search: string,
+) => ['admin-organizations', status, offset, search] as const;
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -58,20 +61,40 @@ function formatCategories(organization: CatalogOrganization): string {
   return organization.categories.map((category) => category.name).join(', ');
 }
 
+const actionButtonClassName =
+  'h-8 shrink-0 cursor-pointer whitespace-nowrap px-2.5 text-xs sm:px-3';
+
 export default function AdminOrganizationsClient() {
   const queryClient = useQueryClient();
-  const [activeStatus, setActiveStatus] = useState<AdminStatusTab>('pending');
+  const [activeStatus, setActiveStatus] = useState<AdminOrganizationStatusTab>('pending');
   const [offset, setOffset] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [rejectTarget, setRejectTarget] = useState<CatalogOrganization | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [actionError, setActionError] = useState('');
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setOffset(0);
+  }, [debouncedSearch, activeStatus]);
+
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
-    queryKey: adminOrganizationsQueryKey(activeStatus, offset),
+    queryKey: adminOrganizationsQueryKey(activeStatus, offset, debouncedSearch),
     queryFn: () =>
       fetchAdminOrganizationsPage({
         status: activeStatus,
         offset,
+        search: debouncedSearch || undefined,
       }),
   });
 
@@ -106,7 +129,7 @@ export default function AdminOrganizationsClient() {
 
   const tabs = useMemo(
     () =>
-      (Object.keys(adminOrganizationStatusLabels) as AdminStatusTab[]).map(
+      (Object.keys(adminOrganizationStatusLabels) as AdminOrganizationStatusTab[]).map(
         (status) => ({
           id: status,
           label: adminOrganizationStatusLabels[status],
@@ -162,25 +185,37 @@ export default function AdminOrganizationsClient() {
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            className={`cursor-pointer rounded-full px-4 py-2 text-sm transition ${
-              activeStatus === tab.id
-                ? 'bg-black text-white'
-                : 'bg-[#E7E7E7] text-black hover:bg-[#dcdcdc]'
-            }`}
-            onClick={() => {
-              setActiveStatus(tab.id);
-              setOffset(0);
-              setActionError('');
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap gap-2">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={cn(
+                'cursor-pointer rounded-full px-4 py-2 text-sm transition',
+                activeStatus === tab.id
+                  ? 'bg-black text-white'
+                  : 'bg-[#E7E7E7] text-black hover:bg-[#dcdcdc]',
+              )}
+              onClick={() => {
+                setActiveStatus(tab.id);
+                setActionError('');
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => {
+            setSearchQuery(event.target.value);
+          }}
+          placeholder="Пошук за назвою організації"
+          className="w-full max-w-md rounded-xl border border-black/20 bg-white px-4 py-2.5 text-sm text-black outline-none transition placeholder:text-[#999999] focus:border-black"
+        />
       </div>
 
       {actionError ? (
@@ -205,7 +240,9 @@ export default function AdminOrganizationsClient() {
           </div>
         ) : organizations.length === 0 ? (
           <p className="px-6 py-10 text-center text-sm text-[#666666]">
-            Немає організацій у цій категорії.
+            {debouncedSearch
+              ? 'За цим запитом нічого не знайдено.'
+              : 'Немає організацій у цій категорії.'}
           </p>
         ) : (
           <div className="overflow-x-auto">
@@ -216,7 +253,7 @@ export default function AdminOrganizationsClient() {
                   <th className="px-4 py-3 font-medium">Категорія</th>
                   <th className="px-4 py-3 font-medium">Адреса</th>
                   <th className="px-4 py-3 font-medium">Створено</th>
-                  <th className="px-4 py-3 font-medium">Дії</th>
+                  <th className="min-w-[280px] px-4 py-3 font-medium">Дії</th>
                 </tr>
               </thead>
               <tbody>
@@ -250,22 +287,26 @@ export default function AdminOrganizationsClient() {
                       {formatDate(organization.createdAt)}
                     </td>
                     <td className="px-4 py-4 align-top">
-                      <div className="flex flex-wrap gap-2">
-                        <Button
-                          size="sm"
-                          disabled={isUpdating}
-                          onClick={() => {
-                            handleStatusChange(organization, 'approved');
-                          }}
-                        >
-                          Підтвердити
-                        </Button>
+                      <div className="flex flex-nowrap items-center gap-1.5">
+                        {activeStatus !== 'approved' ? (
+                          <Button
+                            size="sm"
+                            disabled={isUpdating}
+                            className={actionButtonClassName}
+                            onClick={() => {
+                              handleStatusChange(organization, 'approved');
+                            }}
+                          >
+                            Підтвердити
+                          </Button>
+                        ) : null}
 
                         {activeStatus !== 'rejected' ? (
                           <Button
                             size="sm"
                             variant="secondary"
                             disabled={isUpdating}
+                            className={actionButtonClassName}
                             onClick={() => {
                               setRejectTarget(organization);
                               setRejectionReason('');
@@ -280,6 +321,7 @@ export default function AdminOrganizationsClient() {
                             size="sm"
                             variant="ghost"
                             disabled={isUpdating}
+                            className={actionButtonClassName}
                             onClick={() => {
                               handleStatusChange(organization, 'archived');
                             }}

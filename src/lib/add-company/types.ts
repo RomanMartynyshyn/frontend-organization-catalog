@@ -14,11 +14,10 @@ export type AddCompanyFormState = {
   districtId: number | null;
   latitude: string;
   longitude: string;
-  phone: string;
+  phones: string[];
   email: string;
   websiteUrl: string;
   telegram: string;
-  viber: string;
   instagram: string;
 };
 
@@ -39,11 +38,10 @@ export function createInitialFormState(): AddCompanyFormState {
     districtId: null,
     latitude: '',
     longitude: '',
-    phone: '',
+    phones: [''],
     email: '',
     websiteUrl: '',
     telegram: '',
-    viber: '',
     instagram: '',
   };
 }

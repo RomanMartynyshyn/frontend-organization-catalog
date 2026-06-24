@@ -11,6 +11,7 @@ import {
   FormField,
 } from '@/components/add-company/FormField';
 import { StepIndicator } from '@/components/add-company/StepIndicator';
+import { StreetAddressAutocomplete } from '@/components/add-company/StreetAddressAutocomplete';
 import { Button } from '@/components/ui/button';
 import { WEEKDAY_LABELS } from '@/lib/add-company/constants';
 import {
@@ -107,6 +108,45 @@ function updateFormField<K extends keyof AddCompanyFormState>(
   }));
 }
 
+function updatePhone(
+  setter: Dispatch<SetStateAction<AddCompanyFormState>>,
+  index: number,
+  value: string,
+) {
+  setter((current) => ({
+    ...current,
+    phones: current.phones.map((phone, phoneIndex) =>
+      phoneIndex === index ? value : phone,
+    ),
+  }));
+}
+
+function addPhone(setter: Dispatch<SetStateAction<AddCompanyFormState>>) {
+  setter((current) => ({
+    ...current,
+    phones: [...current.phones, ''],
+  }));
+}
+
+function removePhone(
+  setter: Dispatch<SetStateAction<AddCompanyFormState>>,
+  index: number,
+) {
+  setter((current) => ({
+    ...current,
+    phones:
+      current.phones.length > 1
+        ? current.phones.filter((_, phoneIndex) => phoneIndex !== index)
+        : current.phones,
+  }));
+}
+
+function hasPhoneFieldError(fieldErrors: FieldErrors): boolean {
+  return Object.keys(fieldErrors).some(
+    (field) => field === 'phones' || field.startsWith('phones.'),
+  );
+}
+
 export default function AddCompanyForm() {
   const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -163,7 +203,21 @@ export default function AddCompanyForm() {
           return;
         }
 
-        setStep(3);
+        if (
+          error.fieldErrors.street ||
+          error.fieldErrors.latitude ||
+          error.fieldErrors.longitude ||
+          error.fieldErrors.districtId ||
+          error.fieldErrors.email ||
+          error.fieldErrors.websiteUrl ||
+          hasPhoneFieldError(error.fieldErrors) ||
+          error.fieldErrors.telegram ||
+          error.fieldErrors.instagram
+        ) {
+          setStep(3);
+          return;
+        }
+
         return;
       }
 
@@ -421,18 +475,30 @@ export default function AddCompanyForm() {
             <FormField
               id="company-street"
               label="Адреса"
+              required
               error={fieldErrors.street}
             >
-              <input
+              <StreetAddressAutocomplete
                 id="company-street"
-                type="text"
                 value={formState.street}
-                onChange={(event) => {
-                  updateFormField(setFormState, 'street', event.target.value);
+                error={fieldErrors.street}
+                onValueChange={(street) => {
+                  updateFormField(setFormState, 'street', street);
                   clearFieldError('street');
                 }}
-                placeholder="Ввести адресу"
-                className={cn(addCompanyInputClassName, fieldErrorClassName(fieldErrors.street))}
+                onManualEdit={() => {
+                  updateFormField(setFormState, 'latitude', '');
+                  updateFormField(setFormState, 'longitude', '');
+                }}
+                onAddressSelect={({ street, latitude, longitude }) => {
+                  setFormState((current) => ({
+                    ...current,
+                    street,
+                    latitude,
+                    longitude,
+                  }));
+                  clearFieldError('street');
+                }}
               />
             </FormField>
 
@@ -471,83 +537,68 @@ export default function AddCompanyForm() {
               ) : null}
             </FormField>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <FormField
-                id="company-latitude"
-                label="Широта"
-                required
-                error={fieldErrors.latitude}
-              >
-                <input
-                  id="company-latitude"
-                  type="number"
-                  step="any"
-                  min={-90}
-                  max={90}
-                  value={formState.latitude}
-                  onChange={(event) => {
-                    updateFormField(setFormState, 'latitude', event.target.value);
-                    clearFieldError('latitude');
-                  }}
-                  placeholder="47.9105"
-                  className={cn(
-                    addCompanyInputClassName,
-                    fieldErrorClassName(fieldErrors.latitude),
-                  )}
-                />
-              </FormField>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-[#1A1A1A]">Телефон</p>
+              {formState.phones.map((phone, index) => {
+                const phoneFieldKey = `phones.${index}`;
+                const phoneError = fieldErrors[phoneFieldKey];
 
-              <FormField
-                id="company-longitude"
-                label="Довгота"
-                required
-                error={fieldErrors.longitude}
+                return (
+                  <div key={phoneFieldKey} className="space-y-1">
+                    <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value="+380"
+                      readOnly
+                      tabIndex={-1}
+                      className={cn(
+                        addCompanyInputClassName,
+                        'w-[88px] shrink-0 bg-[#F4F4F4] text-[#666666]',
+                      )}
+                    />
+                    <input
+                      id={index === 0 ? 'company-phone' : undefined}
+                      type="tel"
+                      value={phone}
+                      onChange={(event) => {
+                        updatePhone(setFormState, index, event.target.value);
+                        clearFieldError(phoneFieldKey);
+                      }}
+                      placeholder="Ввести номер"
+                      className={cn(
+                        addCompanyInputClassName,
+                        fieldErrorClassName(phoneError),
+                      )}
+                    />
+                    {formState.phones.length > 1 ? (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="shrink-0 px-3"
+                        onClick={() => {
+                          removePhone(setFormState, index);
+                          clearFieldError(phoneFieldKey);
+                        }}
+                      >
+                        Видалити
+                      </Button>
+                    ) : null}
+                    </div>
+                    {phoneError ? (
+                      <p className="text-xs text-red-600">{phoneError}</p>
+                    ) : null}
+                  </div>
+                );
+              })}
+              <Button
+                type="button"
+                variant="secondary"
+                className="h-9 px-3 text-sm"
+                onClick={() => addPhone(setFormState)}
               >
-                <input
-                  id="company-longitude"
-                  type="number"
-                  step="any"
-                  min={-180}
-                  max={180}
-                  value={formState.longitude}
-                  onChange={(event) => {
-                    updateFormField(setFormState, 'longitude', event.target.value);
-                    clearFieldError('longitude');
-                  }}
-                  placeholder="33.3918"
-                  className={cn(
-                    addCompanyInputClassName,
-                    fieldErrorClassName(fieldErrors.longitude),
-                  )}
-                />
-              </FormField>
+                Додати номер
+              </Button>
             </div>
-
-            <FormField id="company-phone" label="Телефон" error={fieldErrors.phone}>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value="+380"
-                  readOnly
-                  tabIndex={-1}
-                  className={cn(
-                    addCompanyInputClassName,
-                    'w-[88px] shrink-0 bg-[#F4F4F4] text-[#666666]',
-                  )}
-                />
-                <input
-                  id="company-phone"
-                  type="tel"
-                  value={formState.phone}
-                  onChange={(event) => {
-                    updateFormField(setFormState, 'phone', event.target.value);
-                    clearFieldError('phone');
-                  }}
-                  placeholder="Ввести номер"
-                  className={cn(addCompanyInputClassName, fieldErrorClassName(fieldErrors.phone))}
-                />
-              </div>
-            </FormField>
 
             <FormField
               id="company-email"
@@ -588,7 +639,7 @@ export default function AddCompanyForm() {
               />
             </FormField>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2">
               <FormField
                 id="company-telegram"
                 label="Telegram"
@@ -607,24 +658,6 @@ export default function AddCompanyForm() {
                     addCompanyInputClassName,
                     fieldErrorClassName(fieldErrors.telegram),
                   )}
-                />
-              </FormField>
-
-              <FormField
-                id="company-viber"
-                label="Viber"
-                error={fieldErrors.viber}
-              >
-                <input
-                  id="company-viber"
-                  type="tel"
-                  value={formState.viber}
-                  onChange={(event) => {
-                    updateFormField(setFormState, 'viber', event.target.value);
-                    clearFieldError('viber');
-                  }}
-                  placeholder="Ввести номер телефону"
-                  className={cn(addCompanyInputClassName, fieldErrorClassName(fieldErrors.viber))}
                 />
               </FormField>
 

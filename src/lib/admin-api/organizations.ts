@@ -10,6 +10,7 @@ type FetchAdminOrganizationsParams = {
   status?: CatalogOrganizationStatus;
   offset?: number;
   limit?: number;
+  search?: string;
 };
 
 export async function fetchAdminOrganizationsPage(
@@ -22,6 +23,12 @@ export async function fetchAdminOrganizationsPage(
 
   if (params.status) {
     searchParams.set('status', params.status);
+  }
+
+  const normalizedSearch = params.search?.trim();
+
+  if (normalizedSearch) {
+    searchParams.set('search', normalizedSearch);
   }
 
   const response = await fetch(`/api/admin/organizations?${searchParams.toString()}`);
@@ -51,11 +58,11 @@ export async function updateAdminOrganizationStatus(
   }
 }
 
-export const adminOrganizationStatusLabels: Record<
-  'pending' | 'rejected' | 'archived',
-  string
-> = {
+export const adminOrganizationStatusLabels = {
   pending: 'Очікують модерації',
+  approved: 'Активні',
   rejected: 'Відхилені',
   archived: 'Архів',
-};
+} as const;
+
+export type AdminOrganizationStatusTab = keyof typeof adminOrganizationStatusLabels;

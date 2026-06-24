@@ -95,10 +95,9 @@ function normalizePhone(value: string): string | undefined {
 export function buildCreateOrganizationPayload(
   state: AddCompanyFormState,
 ): CreateOrganizationPayload {
-  const phoneNumbers = [
-    normalizePhone(state.phone),
-    normalizePhone(state.viber),
-  ].filter((value): value is string => Boolean(value));
+  const phoneNumbers = state.phones
+    .map(normalizePhone)
+    .filter((value): value is string => Boolean(value));
   const instagram = normalizeInstagram(state.instagram);
   const telegram = normalizeTelegram(state.telegram);
 
@@ -223,16 +222,17 @@ export function validateStep(
     const latitude = Number(state.latitude);
     const longitude = Number(state.longitude);
 
-    if (!state.latitude.trim()) {
-      errors.latitude = 'Вкажіть широту';
-    } else if (Number.isNaN(latitude) || latitude < -90 || latitude > 90) {
-      errors.latitude = 'Широта має бути числом від -90 до 90';
-    }
-
-    if (!state.longitude.trim()) {
-      errors.longitude = 'Вкажіть довготу';
-    } else if (Number.isNaN(longitude) || longitude < -180 || longitude > 180) {
-      errors.longitude = 'Довгота має бути числом від -180 до 180';
+    if (!state.latitude.trim() || !state.longitude.trim()) {
+      errors.street = 'Оберіть адресу зі списку підказок';
+    } else if (
+      Number.isNaN(latitude) ||
+      latitude < -90 ||
+      latitude > 90 ||
+      Number.isNaN(longitude) ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      errors.street = 'Оберіть коректну адресу зі списку підказок';
     }
 
     const email = state.email.trim();
@@ -272,6 +272,12 @@ export function validateAllSteps(state: AddCompanyFormState): FieldErrors {
 }
 
 export function mapApiFieldToFormField(field: string): string {
+  const phoneNumberMatch = field.match(/^contacts\.phoneNumbers\.(\d+)$/);
+
+  if (phoneNumberMatch) {
+    return `phones.${phoneNumberMatch[1]}`;
+  }
+
   const mappings: Record<string, string> = {
     'categoryIds.0': 'categoryId',
     'categoryIds': 'categoryId',
@@ -284,7 +290,6 @@ export function mapApiFieldToFormField(field: string): string {
     'locations.0.districtId': 'districtId',
     'locations': 'street',
     'contacts.email': 'email',
-    'contacts.phoneNumbers.0': 'phone',
     'socialLinks.instagram': 'instagram',
     'socialLinks.telegram': 'telegram',
     'socialLinks.facebook': 'instagram',
