@@ -44,12 +44,24 @@ export type CatalogLocation = {
 };
 
 export type CatalogLocationInput = {
-  street: string;
+  street?: string;
   city: string;
   region: string;
-  postCode: string;
+  postCode?: string;
   latitude: number | string;
   longitude: number | string;
+  districtId?: number;
+};
+
+export type CreateOrganizationContacts = {
+  email?: string;
+  phoneNumbers?: string[];
+};
+
+export type CreateOrganizationSocialLinks = {
+  facebook?: string;
+  instagram?: string;
+  telegram?: string;
 };
 
 export type CatalogOrganization = {
@@ -76,6 +88,12 @@ export type FetchOrganizationsParams = {
   limit?: number;
   offset?: number;
   search?: string;
+  status?: CatalogOrganizationStatus;
+};
+
+export type UpdateOrganizationStatusPayload = {
+  status: 'approved' | 'rejected' | 'archived';
+  rejectionReason?: string | null;
 };
 
 export type PaginatedOrganizations = {
@@ -87,6 +105,9 @@ export type CreateOrganizationPayload = {
   name: string;
   description?: string;
   websiteUrl?: string;
+  workingHours?: string;
+  contacts?: CreateOrganizationContacts;
+  socialLinks?: CreateOrganizationSocialLinks;
   categoryIds: number[];
   locations?: CatalogLocationInput[];
 };
