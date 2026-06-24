@@ -1,4 +1,22 @@
-import type { Company } from '@/types/company';
+import type { Company, CompanyLocation } from '@/types/company';
+
+function mockLocations(addresses: string[]): CompanyLocation[] {
+  return addresses.map((address, index) => ({
+    id: index + 1,
+    address,
+    street: address.split(',')[0]?.trim() || address,
+    district: null,
+  }));
+}
+
+function mockContacts(
+  contacts: Omit<Company['contacts'], 'phones'> & { phone: string },
+): Company['contacts'] {
+  return {
+    ...contacts,
+    phones: contacts.phone ? [contacts.phone] : [],
+  };
+}
 
 export const organizations: Company[] = [
   {
@@ -20,14 +38,19 @@ export const organizations: Company[] = [
       'вул. Степана Бандери, 2/12',
       'вул. Івана Мазепи, 33/2',
     ],
-    contacts: {
+    locations: mockLocations([
+      'вул. Інновацій, 27/1',
+      'вул. Степана Бандери, 2/12',
+      'вул. Івана Мазепи, 33/2',
+    ]),
+    contacts: mockContacts({
       website: 'www.company.com',
       phone: '+38 052 367 42 15',
       email: 'emailcompany@gmail.com',
       instagram: 'https://instagram.com/company',
       facebook: 'https://facebook.com/company',
       telegram: 'https://t.me/company',
-    },
+    }),
   },
 
   {
@@ -45,14 +68,15 @@ export const organizations: Company[] = [
     primaryAddress: 'вул. Січових стрільців, 75/11',
     streetAddress: 'вул. Січових стрільців, 75/11',
     addresses: ['вул. Січових стрільців, 75/11'],
-    contacts: {
+    locations: mockLocations(['вул. Січових стрільців, 75/11']),
+    contacts: mockContacts({
       website: 'www.it-academy.ua',
       phone: '+38 050 111 22 33',
       email: 'itacademy@gmail.com',
       instagram: 'https://instagram.com/itacademy',
       facebook: 'https://facebook.com/itacademy',
       telegram: 'https://t.me/itacademy',
-    },
+    }),
   },
 
   {
@@ -70,14 +94,18 @@ export const organizations: Company[] = [
     primaryAddress: 'вул. Ярослава Мудрого, 65/8',
     streetAddress: 'вул. Ярослава Мудрого, 65/8',
     addresses: ['вул. Ярослава Мудрого, 65/8', 'вул. Панаса Мирного, 3/7'],
-    contacts: {
+    locations: mockLocations([
+      'вул. Ярослава Мудрого, 65/8',
+      'вул. Панаса Мирного, 3/7',
+    ]),
+    contacts: mockContacts({
       website: 'www.medcenter.ua',
       phone: '+38 067 222 44 55',
       email: 'info@medcenter.ua',
       instagram: 'https://instagram.com/medcenter',
       facebook: 'https://facebook.com/medcenter',
       telegram: 'https://t.me/medcenter',
-    },
+    }),
   },
 
   {
@@ -95,13 +123,14 @@ export const organizations: Company[] = [
     primaryAddress: 'вул. Революції, 5/5',
     streetAddress: 'вул. Революції, 5/5',
     addresses: ['вул. Революції, 5/5'],
-    contacts: {
+    locations: mockLocations(['вул. Революції, 5/5']),
+    contacts: mockContacts({
       website: 'www.edu-house.com',
       phone: '+38 093 888 77 66',
       email: 'support@edu-house.com',
       instagram: 'https://instagram.com/eduhouse',
       facebook: 'https://facebook.com/eduhouse',
       telegram: 'https://t.me/eduhouse',
-    },
+    }),
   },
 ];

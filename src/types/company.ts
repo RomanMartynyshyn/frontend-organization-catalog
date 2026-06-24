@@ -1,3 +1,10 @@
+export type CompanyLocation = {
+  id: number;
+  address: string;
+  street: string;
+  district: string | null;
+};
+
 export type Company = {
   id: number;
   slug: string;
@@ -14,9 +21,11 @@ export type Company = {
   primaryAddress: string;
   streetAddress: string;
   addresses: string[];
+  locations: CompanyLocation[];
   contacts: {
     website: string;
     phone: string;
+    phones: string[];
     email: string;
     instagram: string;
     facebook: string;

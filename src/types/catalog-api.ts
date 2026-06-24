@@ -23,9 +23,9 @@ export type CatalogOrganizationStatus =
 export type CatalogOrganizationContacts = {
   phone?: string | null;
   email?: string | null;
+  phone_numbers?: string[];
 };
 
-/** Backend field name is `sociaLinks` (maps to social_links in DB). */
 export type CatalogSocialLinks = {
   instagram?: string | null;
   facebook?: string | null;
@@ -58,7 +58,8 @@ export type CatalogOrganization = {
   description: string | null;
   websiteUrl: string | null;
   contacts: CatalogOrganizationContacts | null;
-  sociaLinks: CatalogSocialLinks | null;
+  socialLinks?: CatalogSocialLinks | null;
+  sociaLinks?: CatalogSocialLinks | null;
   workingHours: string | null;
   status: CatalogOrganizationStatus;
   createdAt: string;
