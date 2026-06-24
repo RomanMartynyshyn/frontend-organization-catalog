@@ -45,6 +45,21 @@ function normalizeTelegram(value: string): string | undefined {
   return `https://t.me/${username}`;
 }
 
+function normalizeFacebook(value: string): string | undefined {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return trimmed.replace(/^http:\/\//i, 'https://');
+  }
+
+  const username = trimmed.replace(/^@/, '');
+  return `https://www.facebook.com/${username}`;
+}
+
 export function buildWorkingHours(state: AddCompanyFormState): string | undefined {
   const selectedDays = WEEKDAY_LABELS.filter((_, index) => state.workingDays[index]);
 
@@ -100,6 +115,7 @@ export function buildCreateOrganizationPayload(
     .filter((value): value is string => Boolean(value));
   const instagram = normalizeInstagram(state.instagram);
   const telegram = normalizeTelegram(state.telegram);
+  const facebook = normalizeFacebook(state.facebook);
 
   const socialLinks: CreateOrganizationPayload['socialLinks'] = {};
 
@@ -111,20 +127,22 @@ export function buildCreateOrganizationPayload(
     socialLinks.telegram = telegram;
   }
 
+  if (facebook) {
+    socialLinks.facebook = facebook;
+  }
+
   const payload: CreateOrganizationPayload = {
     name: state.name.trim(),
     categoryIds: state.categoryId ? [state.categoryId] : [],
-    locations: [
-      {
-        street: state.street.trim() || undefined,
-        city: state.city.trim(),
-        region: state.region.trim(),
-        postCode: state.postCode.trim() || undefined,
-        latitude: Number(state.latitude),
-        longitude: Number(state.longitude),
-        districtId: state.districtId ?? undefined,
-      },
-    ],
+    locations: state.locations.map((location) => ({
+      street: location.street.trim() || undefined,
+      city: location.city.trim(),
+      region: location.region.trim(),
+      postCode: location.postCode.trim() || undefined,
+      latitude: Number(location.latitude),
+      longitude: Number(location.longitude),
+      districtId: location.districtId ?? undefined,
+    })),
   };
 
   const description = state.description.trim();
@@ -161,6 +179,54 @@ export function buildCreateOrganizationPayload(
   return payload;
 }
 
+function validateLocation(
+  location: AddCompanyFormState['locations'][number],
+  index: number,
+  errors: FieldErrors,
+): void {
+  const prefix = `locations.${index}`;
+  const city = location.city.trim();
+  const region = location.region.trim();
+
+  if (!city) {
+    errors[`${prefix}.city`] = 'Введіть місто';
+  } else if (city.length > 50) {
+    errors[`${prefix}.city`] = 'Місто не може перевищувати 50 символів';
+  }
+
+  if (!region) {
+    errors[`${prefix}.region`] = 'Введіть область';
+  } else if (region.length > 50) {
+    errors[`${prefix}.region`] = 'Область не може перевищувати 50 символів';
+  }
+
+  if (location.street.trim().length > 50) {
+    errors[`${prefix}.street`] = 'Адреса не може перевищувати 50 символів';
+  }
+
+  const postCode = location.postCode.trim();
+
+  if (postCode && postCode.length !== 5) {
+    errors[`${prefix}.postCode`] = 'Індекс має містити 5 цифр';
+  }
+
+  const latitude = Number(location.latitude);
+  const longitude = Number(location.longitude);
+
+  if (!location.latitude.trim() || !location.longitude.trim()) {
+    errors[`${prefix}.street`] = 'Оберіть адресу зі списку підказок';
+  } else if (
+    Number.isNaN(latitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    Number.isNaN(longitude) ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    errors[`${prefix}.street`] = 'Оберіть коректну адресу зі списку підказок';
+  }
+}
+
 export function validateStep(
   step: 1 | 2 | 3,
   state: AddCompanyFormState,
@@ -194,46 +260,9 @@ export function validateStep(
   }
 
   if (step === 3) {
-    const city = state.city.trim();
-    const region = state.region.trim();
-
-    if (!city) {
-      errors.city = 'Введіть місто';
-    } else if (city.length > 50) {
-      errors.city = 'Місто не може перевищувати 50 символів';
-    }
-
-    if (!region) {
-      errors.region = 'Введіть область';
-    } else if (region.length > 50) {
-      errors.region = 'Область не може перевищувати 50 символів';
-    }
-
-    if (state.street.trim().length > 50) {
-      errors.street = 'Адреса не може перевищувати 50 символів';
-    }
-
-    const postCode = state.postCode.trim();
-
-    if (postCode && postCode.length !== 5) {
-      errors.postCode = 'Індекс має містити 5 цифр';
-    }
-
-    const latitude = Number(state.latitude);
-    const longitude = Number(state.longitude);
-
-    if (!state.latitude.trim() || !state.longitude.trim()) {
-      errors.street = 'Оберіть адресу зі списку підказок';
-    } else if (
-      Number.isNaN(latitude) ||
-      latitude < -90 ||
-      latitude > 90 ||
-      Number.isNaN(longitude) ||
-      longitude < -180 ||
-      longitude > 180
-    ) {
-      errors.street = 'Оберіть коректну адресу зі списку підказок';
-    }
+    state.locations.forEach((location, index) => {
+      validateLocation(location, index, errors);
+    });
 
     const email = state.email.trim();
 
@@ -258,6 +287,12 @@ export function validateStep(
     if (state.telegram.trim() && telegram && !isValidHttpsUrl(telegram)) {
       errors.telegram = 'Введіть коректне посилання або @username для Telegram';
     }
+
+    const facebook = normalizeFacebook(state.facebook);
+
+    if (state.facebook.trim() && facebook && !isValidHttpsUrl(facebook)) {
+      errors.facebook = 'Введіть коректне посилання або @username для Facebook';
+    }
   }
 
   return errors;
@@ -278,21 +313,29 @@ export function mapApiFieldToFormField(field: string): string {
     return `phones.${phoneNumberMatch[1]}`;
   }
 
+  const categoryMatch = field.match(/^categoryIds(?:\.(\d+))?$/);
+
+  if (categoryMatch) {
+    return 'categoryId';
+  }
+
+  const locationMatch = field.match(/^locations\.(\d+)\.(.+)$/);
+
+  if (locationMatch) {
+    return `locations.${locationMatch[1]}.${locationMatch[2]}`;
+  }
+
+  if (field === 'locations') {
+    return 'locations.0.street';
+  }
+
   const mappings: Record<string, string> = {
     'categoryIds.0': 'categoryId',
     'categoryIds': 'categoryId',
-    'locations.0.city': 'city',
-    'locations.0.region': 'region',
-    'locations.0.street': 'street',
-    'locations.0.postCode': 'postCode',
-    'locations.0.latitude': 'latitude',
-    'locations.0.longitude': 'longitude',
-    'locations.0.districtId': 'districtId',
-    'locations': 'street',
     'contacts.email': 'email',
     'socialLinks.instagram': 'instagram',
     'socialLinks.telegram': 'telegram',
-    'socialLinks.facebook': 'instagram',
+    'socialLinks.facebook': 'facebook',
     websiteUrl: 'websiteUrl',
     workingHours: 'workingHours',
     description: 'description',

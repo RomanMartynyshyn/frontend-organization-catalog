@@ -253,7 +253,7 @@ export default function AdminOrganizationsClient() {
                   <th className="px-4 py-3 font-medium">Категорія</th>
                   <th className="px-4 py-3 font-medium">Адреса</th>
                   <th className="px-4 py-3 font-medium">Створено</th>
-                  <th className="min-w-[280px] px-4 py-3 font-medium">Дії</th>
+                  <th className="min-w-[360px] px-4 py-3 font-medium">Дії</th>
                 </tr>
               </thead>
               <tbody>
@@ -288,6 +288,18 @@ export default function AdminOrganizationsClient() {
                     </td>
                     <td className="px-4 py-4 align-top">
                       <div className="flex flex-nowrap items-center gap-1.5">
+                        <Link
+                          href={routes.company(organization.id)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={cn(
+                            actionButtonClassName,
+                            'inline-flex items-center rounded-md border border-black/20 bg-white text-black hover:bg-[#F4F4F4]',
+                          )}
+                        >
+                          Переглянути
+                        </Link>
+
                         {activeStatus !== 'approved' ? (
                           <Button
                             size="sm"

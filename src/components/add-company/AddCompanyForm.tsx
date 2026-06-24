@@ -22,8 +22,10 @@ import {
 } from '@/lib/add-company/validation';
 import {
   createInitialFormState,
+  createInitialLocation,
   type AddCompanyFormState,
   type FieldErrors,
+  type LocationFormState,
 } from '@/lib/add-company/types';
 import { organizationsQueryKeys } from '@/lib/catalog-api/organizationsQuery';
 import { cn } from '@/lib/cn';
@@ -147,6 +149,46 @@ function hasPhoneFieldError(fieldErrors: FieldErrors): boolean {
   );
 }
 
+function hasLocationFieldError(fieldErrors: FieldErrors): boolean {
+  return Object.keys(fieldErrors).some(
+    (field) => field === 'locations' || field.startsWith('locations.'),
+  );
+}
+
+function updateLocationField(
+  setter: Dispatch<SetStateAction<AddCompanyFormState>>,
+  index: number,
+  field: keyof LocationFormState,
+  value: LocationFormState[keyof LocationFormState],
+) {
+  setter((current) => ({
+    ...current,
+    locations: current.locations.map((location, locationIndex) =>
+      locationIndex === index ? { ...location, [field]: value } : location,
+    ),
+  }));
+}
+
+function addLocation(setter: Dispatch<SetStateAction<AddCompanyFormState>>) {
+  setter((current) => ({
+    ...current,
+    locations: [...current.locations, createInitialLocation()],
+  }));
+}
+
+function removeLocation(
+  setter: Dispatch<SetStateAction<AddCompanyFormState>>,
+  index: number,
+) {
+  setter((current) => ({
+    ...current,
+    locations:
+      current.locations.length > 1
+        ? current.locations.filter((_, locationIndex) => locationIndex !== index)
+        : current.locations,
+  }));
+}
+
 export default function AddCompanyForm() {
   const queryClient = useQueryClient();
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -204,15 +246,13 @@ export default function AddCompanyForm() {
         }
 
         if (
-          error.fieldErrors.street ||
-          error.fieldErrors.latitude ||
-          error.fieldErrors.longitude ||
-          error.fieldErrors.districtId ||
+          hasLocationFieldError(error.fieldErrors) ||
           error.fieldErrors.email ||
           error.fieldErrors.websiteUrl ||
           hasPhoneFieldError(error.fieldErrors) ||
           error.fieldErrors.telegram ||
-          error.fieldErrors.instagram
+          error.fieldErrors.instagram ||
+          error.fieldErrors.facebook
         ) {
           setStep(3);
           return;
@@ -471,71 +511,146 @@ export default function AddCompanyForm() {
         ) : null}
 
         {step === 3 ? (
-          <div className="space-y-3">
-            <FormField
-              id="company-street"
-              label="Адреса"
-              required
-              error={fieldErrors.street}
-            >
-              <StreetAddressAutocomplete
-                id="company-street"
-                value={formState.street}
-                error={fieldErrors.street}
-                onValueChange={(street) => {
-                  updateFormField(setFormState, 'street', street);
-                  clearFieldError('street');
-                }}
-                onManualEdit={() => {
-                  updateFormField(setFormState, 'latitude', '');
-                  updateFormField(setFormState, 'longitude', '');
-                }}
-                onAddressSelect={({ street, latitude, longitude }) => {
-                  setFormState((current) => ({
-                    ...current,
-                    street,
-                    latitude,
-                    longitude,
-                  }));
-                  clearFieldError('street');
-                }}
-              />
-            </FormField>
+          <div className="space-y-5">
+            {formState.locations.map((location, locationIndex) => {
+              const streetKey = `locations.${locationIndex}.street`;
+              const postCodeKey = `locations.${locationIndex}.postCode`;
+              const districtKey = `locations.${locationIndex}.districtId`;
+              const streetError = fieldErrors[streetKey];
+              const postCodeError = fieldErrors[postCodeKey];
+              const districtError = fieldErrors[districtKey];
 
-            <FormField
-              id="company-district"
-              label="Район"
-              error={fieldErrors.districtId}
+              return (
+                <div
+                  key={`location-${locationIndex}`}
+                  className="space-y-3 rounded-xl border border-black/10 p-4"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="font-eUkraine text-sm font-semibold text-black">
+                      Адреса {locationIndex + 1}
+                    </h3>
+                    {formState.locations.length > 1 ? (
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="h-8 px-3 text-xs"
+                        onClick={() => {
+                          removeLocation(setFormState, locationIndex);
+                        }}
+                      >
+                        Видалити адресу
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  <FormField
+                    id={`company-street-${locationIndex}`}
+                    label="Адреса"
+                    required
+                    error={streetError}
+                  >
+                    <StreetAddressAutocomplete
+                      id={`company-street-${locationIndex}`}
+                      value={location.street}
+                      error={streetError}
+                      onValueChange={(street) => {
+                        updateLocationField(setFormState, locationIndex, 'street', street);
+                        clearFieldError(streetKey);
+                      }}
+                      onManualEdit={() => {
+                        updateLocationField(setFormState, locationIndex, 'latitude', '');
+                        updateLocationField(setFormState, locationIndex, 'longitude', '');
+                      }}
+                      onAddressSelect={({ street, latitude, longitude }) => {
+                        setFormState((current) => ({
+                          ...current,
+                          locations: current.locations.map((item, index) =>
+                            index === locationIndex
+                              ? { ...item, street, latitude, longitude }
+                              : item,
+                          ),
+                        }));
+                        clearFieldError(streetKey);
+                      }}
+                    />
+                  </FormField>
+
+                  <FormField
+                    id={`company-post-code-${locationIndex}`}
+                    label="Поштовий індекс"
+                    error={postCodeError}
+                  >
+                    <input
+                      id={`company-post-code-${locationIndex}`}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={5}
+                      value={location.postCode}
+                      onChange={(event) => {
+                        updateLocationField(
+                          setFormState,
+                          locationIndex,
+                          'postCode',
+                          event.target.value.replace(/\D/g, '').slice(0, 5),
+                        );
+                        clearFieldError(postCodeKey);
+                      }}
+                      placeholder="50000"
+                      className={cn(
+                        addCompanyInputClassName,
+                        fieldErrorClassName(postCodeError),
+                      )}
+                    />
+                  </FormField>
+
+                  <FormField
+                    id={`company-district-${locationIndex}`}
+                    label="Район"
+                    error={districtError}
+                  >
+                    <select
+                      id={`company-district-${locationIndex}`}
+                      value={location.districtId ?? ''}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        updateLocationField(
+                          setFormState,
+                          locationIndex,
+                          'districtId',
+                          value ? Number(value) : null,
+                        );
+                        clearFieldError(districtKey);
+                      }}
+                      disabled={isDistrictsLoading || isDistrictsError}
+                      className={cn(
+                        addCompanySelectClassName,
+                        fieldErrorClassName(districtError),
+                      )}
+                    >
+                      <option value="">Обрати район</option>
+                      {districts.map((district) => (
+                        <option key={district.districtId} value={district.districtId}>
+                          {district.name}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                </div>
+              );
+            })}
+
+            <Button
+              type="button"
+              variant="secondary"
+              className="h-9 px-3 text-sm"
+              onClick={() => addLocation(setFormState)}
             >
-              <select
-                id="company-district"
-                value={formState.districtId ?? ''}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  updateFormField(
-                    setFormState,
-                    'districtId',
-                    value ? Number(value) : null,
-                  );
-                  clearFieldError('districtId');
-                }}
-                disabled={isDistrictsLoading || isDistrictsError}
-                className={cn(
-                  addCompanySelectClassName,
-                  fieldErrorClassName(fieldErrors.districtId),
-                )}
-              >
-                <option value="">Обрати район</option>
-                {districts.map((district) => (
-                  <option key={district.districtId} value={district.districtId}>
-                    {district.name}
-                  </option>
-                ))}
-              </select>
-              {isDistrictsError ? (
-                <p className="text-xs text-red-600">Не вдалося завантажити райони.</p>
-              ) : null}
-            </FormField>
+              Додати адресу
+            </Button>
+
+            {isDistrictsError ? (
+              <p className="text-xs text-red-600">Не вдалося завантажити райони.</p>
+            ) : null}
 
             <div className="space-y-2">
               <p className="text-sm font-medium text-[#1A1A1A]">Телефон</p>
@@ -639,7 +754,7 @@ export default function AddCompanyForm() {
               />
             </FormField>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-3">
               <FormField
                 id="company-telegram"
                 label="Telegram"
@@ -678,6 +793,27 @@ export default function AddCompanyForm() {
                   className={cn(
                     addCompanyInputClassName,
                     fieldErrorClassName(fieldErrors.instagram),
+                  )}
+                />
+              </FormField>
+
+              <FormField
+                id="company-facebook"
+                label="Facebook"
+                error={fieldErrors.facebook}
+              >
+                <input
+                  id="company-facebook"
+                  type="text"
+                  value={formState.facebook}
+                  onChange={(event) => {
+                    updateFormField(setFormState, 'facebook', event.target.value);
+                    clearFieldError('facebook');
+                  }}
+                  placeholder="@username"
+                  className={cn(
+                    addCompanyInputClassName,
+                    fieldErrorClassName(fieldErrors.facebook),
                   )}
                 />
               </FormField>
