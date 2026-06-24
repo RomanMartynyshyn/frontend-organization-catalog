@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
+import { ShareCurrentUrlButton } from '@/components/ShareCurrentUrlButton';
 import { routes } from '@/config/routes';
 import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
 import {
@@ -181,11 +182,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
                 <h1 className="font-eUkraine text-[28px] leading-[32px] font-semibold text-black">
                   {company.name}
                 </h1>
-                <button
-                  type="button"
-                  className="shrink-0 opacity-80 transition hover:opacity-100"
-                  aria-label="Поділитися"
-                >
+                <ShareCurrentUrlButton>
                   <Image
                     src="/assets/icons/share.svg"
                     alt=""
@@ -193,7 +190,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
                     height={32}
                     aria-hidden
                   />
-                </button>
+                </ShareCurrentUrlButton>
               </div>
 
               {locations.length > 0 ? (
