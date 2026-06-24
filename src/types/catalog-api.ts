@@ -76,6 +76,12 @@ export type FetchOrganizationsParams = {
   limit?: number;
   offset?: number;
   search?: string;
+  status?: CatalogOrganizationStatus;
+};
+
+export type UpdateOrganizationStatusPayload = {
+  status: 'approved' | 'rejected' | 'archived';
+  rejectionReason?: string | null;
 };
 
 export type PaginatedOrganizations = {
