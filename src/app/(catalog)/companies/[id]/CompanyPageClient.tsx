@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo } from 'react';
 
-import { ShareCurrentUrlButton } from '@/components/ShareCurrentUrlButton';
+import { ShareUrlMenu } from '@/components/ShareUrlMenu';
 import { routes } from '@/config/routes';
 import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
 import {
@@ -182,7 +182,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
                 <h1 className="font-eUkraine text-[28px] leading-[32px] font-semibold text-black">
                   {company.name}
                 </h1>
-                <ShareCurrentUrlButton>
+                <ShareUrlMenu title={company.name}>
                   <Image
                     src="/assets/icons/share.svg"
                     alt=""
@@ -190,7 +190,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
                     height={32}
                     aria-hidden
                   />
-                </ShareCurrentUrlButton>
+                </ShareUrlMenu>
               </div>
 
               {locations.length > 0 ? (
