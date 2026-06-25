@@ -1,5 +1,5 @@
 import { NotFoundPage } from '@/components/NotFoundPage';
 
-export default function CompanyNotFound() {
+export default function NotFound() {
   return <NotFoundPage />;
 }
