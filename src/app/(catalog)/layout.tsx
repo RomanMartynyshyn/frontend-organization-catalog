@@ -29,7 +29,7 @@ export default function CatalogLayout({
       <Suspense fallback={<div className="border-b border-black/10 bg-white py-3" aria-hidden />}>
         <SiteHeader />
       </Suspense>
-      <main className={`${PAGE_CONTAINER_CLASS} flex-1 bg-white py-8`}>
+      <main className={`${PAGE_CONTAINER_CLASS} flex-1 py-8`}>
         {children}
       </main>
       <SiteFooter />

@@ -26,51 +26,50 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-ring: var(--ring);
   --color-accent: var(--accent);
-  --font-sans: "e-Ukraine", system-ui, sans-serif;
+  --font-sans: 'e-Ukraine', system-ui, sans-serif;
 }
 
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine/e-Ukraine-Regular.woff2") format("woff2");
+  font-family: 'e-Ukraine';
+  src: url('/fonts/e-Ukraine/e-Ukraine-Regular.woff2') format('woff2');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine/e-Ukraine-Bold.woff2") format("woff2");
+  font-family: 'e-Ukraine';
+  src: url('/fonts/e-Ukraine/e-Ukraine-Bold.woff2') format('woff2');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine/e-Ukraine-Light.woff2") format("woff2");
+  font-family: 'e-Ukraine';
+  src: url('/fonts/e-Ukraine/e-Ukraine-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine/e-Ukraine-Medium.woff2") format("woff2");
+  font-family: 'e-Ukraine';
+  src: url('/fonts/e-Ukraine/e-Ukraine-Medium.woff2') format('woff2');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine/e-Ukraine-Thin.woff2") format("woff2");
+  font-family: 'e-Ukraine';
+  src: url('/fonts/e-Ukraine/e-Ukraine-Thin.woff2') format('woff2');
   font-weight: 100;
   font-style: normal;
 }
 
 @font-face {
-  font-family: "e-Ukraine";
-  src: url("/fonts/e-Ukraine/e-Ukraine-UltraLight.woff2") format("woff2");
+  font-family: 'e-Ukraine';
+  src: url('/fonts/e-Ukraine/e-Ukraine-UltraLight.woff2') format('woff2');
   font-weight: 200;
   font-style: normal;
 }
-
 
 html,
 body {
@@ -78,9 +77,9 @@ body {
 }
 
 body {
-  background: var(--background);
+  background: #fff;
   color: var(--foreground);
-  font-family: "e-Ukraine", system-ui, sans-serif;
+  font-family: 'e-Ukraine', system-ui, sans-serif;
 }
 
 :focus-visible {
