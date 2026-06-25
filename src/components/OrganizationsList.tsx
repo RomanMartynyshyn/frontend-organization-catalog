@@ -41,7 +41,7 @@ export function OrganizationsList({
         <div className="mb-4 hidden h-7 shrink-0 lg:block" aria-hidden="true" />
       )}
 
-      <div className="flex min-h-[280px] max-h-[min(55vh,480px)] flex-col rounded-2xl bg-[#d9d9d9] px-4 py-4 lg:max-h-none lg:min-h-0 lg:flex-1">
+      <div className="flex max-h-[min(55vh,480px)] min-h-[280px] flex-col rounded-2xl bg-[#D9DDF2] px-4 py-4 lg:max-h-none lg:min-h-0 lg:flex-1">
         <div
           ref={scrollContainerRef}
           className="min-h-0 flex-1 overflow-y-auto pr-8 sm:pr-10"

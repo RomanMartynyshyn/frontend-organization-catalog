@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 import { routes } from '@/config/routes';
 import { PAGE_CONTAINER_CLASS } from '@/lib/constants';
+import Image from 'next/image';
 
 export function SiteFooter() {
   return (
@@ -11,8 +12,14 @@ export function SiteFooter() {
       <div className={`${PAGE_CONTAINER_CLASS} py-6`}>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <Link href={routes.home} className="flex shrink-0 items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-md bg-white text-sm font-bold text-black">
-              logo
+            <span className="flex items-center justify-center rounded-md text-sm font-bold text-black">
+              <Image
+                src="/assets/icons/logo_footer.svg"
+                alt="Logo"
+                width={111}
+                height={44}
+                className="h-auto w-[80px] sm:w-[100px] md:w-[111px]"
+              />
             </span>
           </Link>
 

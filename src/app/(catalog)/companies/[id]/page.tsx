@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { getCompanyById } from '@/lib/companies/getCompanyById';
-import CompanyPageClient from './CompanyPageClient';
+// import CompanyPageClient from './CompanyPageClient';
+import CompanyPageClientDraft from './CompanyPageClientDraft';
 
 export const metadata: Metadata = {
   title: 'Company Details',
@@ -20,5 +21,6 @@ export default async function CompanyPage({ params }: CompanyPageProps) {
     notFound();
   }
 
-  return <CompanyPageClient company={company} />;
+  // return <CompanyPageClient company={company} />;
+return <CompanyPageClientDraft company={company} />;
 }
