@@ -41,7 +41,7 @@ export function FiltersPanel({
     <aside className="flex w-full shrink-0 flex-col lg:h-full lg:w-[240px]">
       <h2 className="mb-4 shrink-0 text-lg font-bold text-black">Фільтри</h2>
 
-      <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#d9d9d9] p-4">
+      <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#D9DDF2] p-4">
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="pb-4">
             <button
@@ -80,7 +80,9 @@ export function FiltersPanel({
                     </label>
                   ))
                 ) : (
-                  <p className="text-sm text-gray-700">Райони зараз недоступні</p>
+                  <p className="text-sm text-gray-700">
+                    Райони зараз недоступні
+                  </p>
                 )}
               </div>
             ) : null}
@@ -90,7 +92,7 @@ export function FiltersPanel({
         <button
           type="button"
           onClick={handleApply}
-          className="mt-4 w-full shrink-0 rounded-md bg-black px-4 py-2.5 text-sm text-white transition hover:opacity-80"
+          className="mt-4 w-full shrink-0 rounded-md bg-[#1B224B] px-4 py-2.5 text-sm text-white transition hover:bg-[#283371] focus:bg-[#0D1126] disabled:bg-[#585C74]"
         >
           Застосувати
         </button>

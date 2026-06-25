@@ -23,7 +23,7 @@ function AboutParagraph({
 
 export default function AboutPage() {
   return (
-    <article className="mx-auto max-w-[800px] space-y-6 pb-12">
+    <article className="w-full space-y-6 pb-12">
       <nav className="text-sm" aria-label="Breadcrumb">
         <Link href={routes.home} className="text-black hover:underline">
           Головна

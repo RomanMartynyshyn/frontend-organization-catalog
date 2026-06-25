@@ -6,7 +6,6 @@ import { useMemo } from 'react';
 
 import { ShareUrlMenu } from '@/components/ShareUrlMenu';
 import { routes } from '@/config/routes';
-// import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
 import { getCategoryIconId } from '@/lib/catalog-api/categoryIcon';
 import {
   formatWorkingHoursBadge,
