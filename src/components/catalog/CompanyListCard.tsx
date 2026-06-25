@@ -6,7 +6,8 @@ import { useState } from 'react';
 
 import { Modal } from '@/components/ui/modal';
 import { routes } from '@/config/routes';
-import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
+// import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
+import { getCategoryIconId } from '@/lib/catalog-api/categoryIcon';
 import type { Company } from '@/types/company';
 
 type CompanyListCardProps = {
@@ -102,17 +103,23 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
   const hasDescription = Boolean(company.shortDescription?.trim());
 
   return (
-    <article className="rounded-[24px] bg-[#c4c4c4] p-4 sm:p-6">
+    <article className="rounded-[24px] bg-[#ECEEF8] p-4 sm:p-6">
       <div className="flex items-start gap-3 sm:gap-4">
         <div className="flex w-[68px] shrink-0 flex-col items-center gap-1.5 sm:w-[92px] sm:gap-2.5">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#d9d9d9] sm:h-20 sm:w-20">
-            <Image
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#B4BBE4] sm:h-20 sm:w-20">
+            {/* <Image
               src={getCategoryIconSrc(company.categoryId)}
               alt={categoryLabel || company.name}
               width={28}
               height={28}
               className="h-5 w-5 sm:h-7 sm:w-7"
-            />
+            /> */}
+
+            <svg className="h-12 w-12 text-[#1B224B]" fill="currentColor">
+              <use
+                href={`/assets/icons/sprite.svg#${getCategoryIconId(Number(company.categoryId))}`}
+              />
+            </svg>
           </div>
 
           {categoryLabel ? (
@@ -123,7 +130,7 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
         </div>
 
         <div className="min-w-0 flex-1 space-y-2 pt-0.5">
-          <h3 className="break-words text-lg font-bold leading-tight text-black sm:text-xl md:text-[26px] md:leading-[1.15]">
+          <h3 className="text-lg leading-tight font-bold break-words text-black sm:text-xl md:text-[26px] md:leading-[1.15]">
             {company.name || '—'}
           </h3>
 
@@ -145,7 +152,7 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
           ) : null}
 
           {workingHoursLabel ? (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-black px-3 py-1 text-xs leading-none text-black">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#15513E] px-3 py-1 text-xs leading-none text-[#15513E]">
               <ClockIcon />
               {workingHoursLabel}
             </span>
@@ -165,7 +172,10 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
 
           <ul className="max-h-[min(60vh,420px)] space-y-3 overflow-y-auto text-sm text-black">
             {addresses.map((address, index) => (
-              <li key={`${company.id}-${index}`} className="flex items-start gap-2">
+              <li
+                key={`${company.id}-${index}`}
+                className="flex items-start gap-2"
+              >
                 <LocationIcon />
                 <span>{address}</span>
               </li>
@@ -184,7 +194,7 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
         <div className="flex justify-end">
           <Link
             href={routes.company(company.id)}
-            className="inline-flex min-w-[148px] items-center justify-center rounded-2xl bg-black px-8 py-3 text-sm font-normal text-white transition hover:opacity-80"
+            className="inline-flex min-w-[148px] items-center justify-center rounded-2xl bg-[#1B224B] px-8 py-3 text-sm font-normal text-white transition hover:bg-[#283371] focus:bg-[#0D1126] disabled:bg-[#585C74]"
           >
             Детальніше
           </Link>

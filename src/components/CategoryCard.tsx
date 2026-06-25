@@ -1,6 +1,7 @@
-import Image from 'next/image';
+// import Image from 'next/image';
 
-import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
+// import { getCategoryIconSrc } from '@/lib/catalog-api/categoryIcon';
+import { getCategoryIconId } from '@/lib/catalog-api/categoryIcon';
 import type { CatalogCategory } from '@/types/catalog-api';
 
 type CategoryCardProps = {
@@ -22,19 +23,28 @@ export function CategoryCard({
       onClick={() => onSelect(id)}
       className={`flex h-[132px] w-full flex-col justify-between rounded-[20px] p-6 text-left transition-colors duration-300 ${
         isActive
-          ? 'bg-[#747474]'
-          : 'bg-[#D0D0D0] hover:cursor-pointer hover:bg-[#c4c4c4]'
-      }`}
+          ? 'bg-[#1B224B] text-white' // Selected: тёмный фон + белый текст
+          : 'bg-[#B4BBE4] text-black hover:cursor-pointer hover:bg-[#D9DDF2]' // Default + Hover: светлый фон + чёрный текст
+      } focus:ring-2 focus:ring-[#8E99D7] focus:outline-none disabled:cursor-not-allowed disabled:bg-[#8B8FA7] disabled:text-white`}
     >
-      <Image
+      {/* <Image
         src={getCategoryIconSrc(category.id)}
         alt={category.name}
         width={24}
         height={24}
         className="h-6 w-6"
-      />
+      /> */}
 
-      <p className="text-base leading-6 font-normal text-black">{category.name}</p>
+      <svg
+        className={`h-6 w-6 ${isActive ? 'text-white' : 'text-[#1B224B]'}`}
+        fill="currentColor"
+      >
+        <use
+          href={`/assets/icons/sprite.svg#${getCategoryIconId(Number(category.id))}`}
+        />
+      </svg>
+
+      <p className="text-base leading-6 font-normal">{category.name}</p>
     </button>
   );
 }

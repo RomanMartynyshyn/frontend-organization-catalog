@@ -93,7 +93,7 @@ function CategorySlides({
         return (
           <div
             key={id}
-            className={`min-w-0 shrink-0 grow-0 basis-[268px] ${slideClassName}`.trim()}
+            className={`min-w-0 shrink-0 grow-0 basis-[268px]  ${slideClassName}`.trim()}
           >
             <CategoryCard
               category={category}
