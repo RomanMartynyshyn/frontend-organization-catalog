@@ -162,7 +162,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
 
       <div className="flex flex-col gap-6 md:flex-row">
         <div className="shrink-0">
-          <div className="mb-3 flex h-[176px] w-[176px] items-center justify-center rounded-full bg-[#E7E7E7]">
+          <div className="mb-3 flex h-[176px] w-[176px] items-center justify-center rounded-full bg-[#AEEAD7]">
             {/* <Image
                 src={getCategoryIconSrc(company.categoryId)}
                 alt={categoriesLabel || company.name}
@@ -184,7 +184,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
-          <div className="flex w-full flex-col gap-5 rounded-[20px] bg-[#E7E7E7] p-6 sm:p-10">
+          <div className="flex w-full flex-col gap-5 rounded-[20px] bg-[#ECEEF8] p-6 sm:p-10">
             <div className="flex items-start justify-between gap-4">
               <h1 className="font-eUkraine text-[28px] leading-[32px] font-semibold text-black">
                 {company.name}
@@ -228,15 +228,43 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
             ) : null}
 
             {workingHoursBadge ? (
-              <div className="inline-flex h-8 w-fit items-center gap-2 rounded-[20px] border border-black py-[7px] pr-3 pl-2">
-                <Image
+              <div className="inline-flex h-8 w-fit items-center gap-2 rounded-[20px] border border-[#15513E] py-[7px] pr-3 pl-2">
+                {/* <Image
                   src="/assets/icons/radio_button_checked.svg"
                   alt=""
                   width={16}
                   height={16}
                   aria-hidden
-                />
-                <p className="font-eUkraine text-[13px] leading-[18px] font-normal text-black">
+                /> */}
+
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  className="text-[#15513E]"
+                  aria-hidden="true"
+                >
+                  <mask
+                    id="mask0_3017_1452"
+                    style={{ maskType: 'alpha' }}
+                    maskUnits="userSpaceOnUse"
+                    x="0"
+                    y="0"
+                    width="16"
+                    height="16"
+                  >
+                    <rect width="16" height="16" fill="#D9D9D9" />
+                  </mask>
+                  <g mask="url(#mask0_3017_1452)">
+                    <path
+                      d="M10.3585 10.3584C11.0085 9.70837 11.3335 8.92226 11.3335 8.00004C11.3335 7.07782 11.0085 6.29171 10.3585 5.64171C9.7085 4.99171 8.92238 4.66671 8.00016 4.66671C7.07794 4.66671 6.29183 4.99171 5.64183 5.64171C4.99183 6.29171 4.66683 7.07782 4.66683 8.00004C4.66683 8.92226 4.99183 9.70837 5.64183 10.3584C6.29183 11.0084 7.07794 11.3334 8.00016 11.3334C8.92238 11.3334 9.7085 11.0084 10.3585 10.3584ZM8.00016 14.6667C7.07794 14.6667 6.21127 14.4917 5.40016 14.1417C4.58905 13.7917 3.8835 13.3167 3.2835 12.7167C2.6835 12.1167 2.2085 11.4112 1.8585 10.6C1.5085 9.78893 1.3335 8.92226 1.3335 8.00004C1.3335 7.07782 1.5085 6.21115 1.8585 5.40004C2.2085 4.58893 2.6835 3.88337 3.2835 3.28337C3.8835 2.68337 4.58905 2.20837 5.40016 1.85837C6.21127 1.50837 7.07794 1.33337 8.00016 1.33337C8.92238 1.33337 9.78905 1.50837 10.6002 1.85837C11.4113 2.20837 12.1168 2.68337 12.7168 3.28337C13.3168 3.88337 13.7918 4.58893 14.1418 5.40004C14.4918 6.21115 14.6668 7.07782 14.6668 8.00004C14.6668 8.92226 14.4918 9.78893 14.1418 10.6C13.7918 11.4112 13.3168 12.1167 12.7168 12.7167C12.1168 13.3167 11.4113 13.7917 10.6002 14.1417C9.78905 14.4917 8.92238 14.6667 8.00016 14.6667ZM8.00016 13.3334C9.48905 13.3334 10.7502 12.8167 11.7835 11.7834C12.8168 10.75 13.3335 9.48893 13.3335 8.00004C13.3335 6.51115 12.8168 5.25004 11.7835 4.21671C10.7502 3.18337 9.48905 2.66671 8.00016 2.66671C6.51127 2.66671 5.25016 3.18337 4.21683 4.21671C3.1835 5.25004 2.66683 6.51115 2.66683 8.00004C2.66683 9.48893 3.1835 10.75 4.21683 11.7834C5.25016 12.8167 6.51127 13.3334 8.00016 13.3334Z"
+                      fill="currentColor"
+                    />
+                  </g>
+                </svg>
+                <p className="font-eUkraine text-[13px] leading-[18px] font-normal text-[#15513E]">
                   {workingHoursBadge}
                 </p>
               </div>
@@ -244,7 +272,7 @@ export default function CompanyPageClient({ company }: CompanyPageClientProps) {
           </div>
 
           {hasDetailsSection ? (
-            <div className="flex w-full flex-col gap-6 rounded-[20px] bg-[#E7E7E7] p-6 sm:p-10">
+            <div className="flex w-full flex-col gap-6 rounded-[20px] bg-[#ECEEF8] p-6 sm:p-10">
               {description ? (
                 <div className="space-y-3">
                   <h2 className="text-xl font-semibold text-black">
