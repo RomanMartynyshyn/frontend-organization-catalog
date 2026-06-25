@@ -18,7 +18,7 @@ export function SiteFooter() {
   ] as const;
 
   return (
-    <footer className="border-border mt-auto border-t bg-black text-white">
+    <footer className="border-border mt-auto border-t bg-[#0D1126] text-white">
       <div className={`${PAGE_CONTAINER_CLASS} py-6`}>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <Link href={routes.home} className="flex shrink-0 items-center gap-3">
