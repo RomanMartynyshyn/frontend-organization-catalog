@@ -28,7 +28,7 @@ export function SelectedFilters({ filters, onReset }: SelectedFiltersProps) {
                 key={filter.id}
                 type="button"
                 onClick={filter.onRemove}
-                className="inline-flex items-center gap-2 rounded-full border border-black/70 bg-[#d9d9d9] px-3 py-1.5 text-sm transition hover:bg-[#c8c8c8]"
+                className="inline-flex items-center gap-2 rounded-full border border-black/70 bg-[#D9DDF2] px-3 py-1.5 text-sm transition hover:bg-[#c8c8c8]"
               >
                 <span>{filter.label}</span>
                 <span className="text-base leading-none" aria-hidden="true">
@@ -42,7 +42,7 @@ export function SelectedFilters({ filters, onReset }: SelectedFiltersProps) {
         <button
           type="button"
           onClick={onReset}
-          className="shrink-0 rounded-md border border-black/70 bg-white px-4 py-1.5 text-sm transition hover:bg-gray-50"
+          className="shrink-0 rounded-md border border-[#1B224B] bg-white px-4 py-1.5 text-sm transition hover:bg-gray-50"
         >
           Скинути фільтри
         </button>
