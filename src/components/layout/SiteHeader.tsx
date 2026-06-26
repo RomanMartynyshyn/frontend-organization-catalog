@@ -12,7 +12,7 @@ export function SiteHeader() {
   const { inputValue, setInputValue } = useDebouncedCatalogSearch();
 
   return (
-    <header className="border-b border-black/10 bg-white">
+    <header className="border-b border-black/10 bg-[#EBFAF5]">
       <div className={`${PAGE_CONTAINER_CLASS} py-3`}>
         <div className="flex flex-col gap-3 md:h-[92px] md:flex-row md:items-center md:justify-between md:gap-6 md:py-0">
           <div className="flex items-center justify-between gap-3 md:contents">
