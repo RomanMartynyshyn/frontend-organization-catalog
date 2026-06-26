@@ -1,0 +1,15 @@
+<svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <mask id="logo-icon-mask" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="44" height="44">
+    <rect width="44" height="44" rx="4" fill="white" />
+  </mask>
+  <g mask="url(#logo-icon-mask)">
+    <path d="M44 0L22 22V0H44Z" fill="#283771" />
+    <path d="M22 22L44 44H22V22Z" fill="#297878" />
+    <path d="M22 22L0 0L22 0V22Z" fill="#285D75" />
+    <path d="M0 44L22 22L22 44H0Z" fill="#2A9C7B" />
+    <path d="M0 0L22 22L0 22L0 0Z" fill="#297778" />
+    <path d="M44 44L22 22H44V44Z" fill="#295E76" />
+    <path d="M22 22L44 0L44 22L22 22Z" fill="#284373" />
+    <path d="M22 22L0 44L0 22L22 22Z" fill="#298A79" />
+  </g>
+</svg>
