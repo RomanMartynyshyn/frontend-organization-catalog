@@ -1,14 +1,14 @@
-import type { CatalogDistrict } from '@/types/catalog-api';
+import type { CatalogAdminUnit } from '@/types/catalog-api';
 
-export function getActiveDistrictNames(
-  districts: CatalogDistrict[],
-  selectedDistrictIds: number[],
+export function getActiveAdminUnitNames(
+  adminUnits: CatalogAdminUnit[],
+  selectedAdminUnitIds: number[],
 ): string[] | undefined {
-  if (!selectedDistrictIds.length) {
+  if (!selectedAdminUnitIds.length) {
     return undefined;
   }
 
-  return districts
-    .filter((district) => selectedDistrictIds.includes(district.districtId))
-    .map((district) => district.name);
+  return adminUnits
+    .filter((unit) => selectedAdminUnitIds.includes(unit.adminUnitId))
+    .map((unit) => unit.name);
 }

@@ -1,12 +1,13 @@
 import { FiltersPanel } from '@/components/FiltersPanel';
 import { OrganizationsList } from '@/components/OrganizationsList';
-import type { CatalogDistrict } from '@/types/catalog-api';
+import type { CatalogAdminUnit } from '@/types/catalog-api';
 import type { CompanyListItem } from '@/types/company';
 
 type CatalogBrowseSectionProps = {
-  districts: CatalogDistrict[];
-  selectedDistrictIds: number[];
-  onSelectedDistrictsChange: (districtIds: number[]) => void;
+  districts: CatalogAdminUnit[];
+  communities: CatalogAdminUnit[];
+  selectedAdminUnitIds: number[];
+  onSelectedAdminUnitsChange: (adminUnitIds: number[]) => void;
   organizations: CompanyListItem[];
   isLoading: boolean;
   hasMore: boolean;
@@ -17,8 +18,9 @@ type CatalogBrowseSectionProps = {
 
 export function CatalogBrowseSection({
   districts,
-  selectedDistrictIds,
-  onSelectedDistrictsChange,
+  communities,
+  selectedAdminUnitIds,
+  onSelectedAdminUnitsChange,
   organizations,
   isLoading,
   hasMore,
@@ -30,8 +32,9 @@ export function CatalogBrowseSection({
     <div className="flex flex-col gap-6 lg:min-h-[480px] lg:h-[min(70vh,720px)] lg:flex-row lg:items-stretch">
       <FiltersPanel
         districts={districts}
-        selectedDistrictIds={selectedDistrictIds}
-        onSelectedDistrictsChange={onSelectedDistrictsChange}
+        communities={communities}
+        selectedAdminUnitIds={selectedAdminUnitIds}
+        onSelectedAdminUnitsChange={onSelectedAdminUnitsChange}
       />
 
       <OrganizationsList

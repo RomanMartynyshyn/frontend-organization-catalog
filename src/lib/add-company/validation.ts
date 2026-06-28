@@ -141,7 +141,7 @@ export function buildCreateOrganizationPayload(
       postCode: location.postCode.trim() || undefined,
       latitude: Number(location.latitude),
       longitude: Number(location.longitude),
-      districtId: location.districtId ?? undefined,
+      adminUnitId: location.adminUnitId ?? undefined,
     })),
   };
 

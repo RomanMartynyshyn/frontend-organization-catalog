@@ -1,40 +1,108 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {CatalogDistrict} from "@/types/catalog-api";
+
+import type { CatalogAdminUnit } from '@/types/catalog-api';
+
+import { formatAdminUnitShortName } from '@/lib/catalog-api/adminUnitHelpers';
+
+type AdminUnitFilterGroupProps = {
+  title: string;
+  units: readonly CatalogAdminUnit[];
+  emptyMessage: string;
+  selectedIds: number[];
+  onToggle: (adminUnitId: number) => void;
+  defaultOpen?: boolean;
+};
+
+function AdminUnitFilterGroup({
+  title,
+  units,
+  emptyMessage,
+  selectedIds,
+  onToggle,
+  defaultOpen = true,
+}: AdminUnitFilterGroupProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="pb-4">
+      <button
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        className="flex w-full items-center justify-between text-sm font-bold text-black"
+      >
+        {title}
+        <svg
+          className={`h-4 w-4 shrink-0 transition ${isOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+
+      {isOpen ? (
+        <div className="mt-3 space-y-2.5">
+          {units.length ? (
+            units.map((unit) => (
+              <label
+                key={unit.adminUnitId}
+                className="flex cursor-pointer items-center gap-2.5 text-sm text-black"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(unit.adminUnitId)}
+                  onChange={() => onToggle(unit.adminUnitId)}
+                  className="h-4 w-4 shrink-0 rounded-sm border border-black accent-black"
+                />
+                <span>{formatAdminUnitShortName(unit)}</span>
+              </label>
+            ))
+          ) : (
+            <p className="text-sm text-gray-700">{emptyMessage}</p>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 type FiltersPanelProps = {
-  districts: readonly CatalogDistrict[];
-  selectedDistrictIds: Number[];
-  onSelectedDistrictsChange: (districtIds: Number[]) => void;
+  districts: readonly CatalogAdminUnit[];
+  communities: readonly CatalogAdminUnit[];
+  selectedAdminUnitIds: number[];
+  onSelectedAdminUnitsChange: (adminUnitIds: number[]) => void;
 };
 
 export function FiltersPanel({
   districts,
-  selectedDistrictIds,
-  onSelectedDistrictsChange,
+  communities,
+  selectedAdminUnitIds,
+  onSelectedAdminUnitsChange,
 }: FiltersPanelProps) {
-  const [isDistrictOpen, setIsDistrictOpen] = useState(true);
-  const [pendingDistricts, setPendingDistricts] =
-    useState<Number[]>(selectedDistrictIds);
+  const [pendingAdminUnitIds, setPendingAdminUnitIds] =
+    useState<number[]>(selectedAdminUnitIds);
 
   useEffect(() => {
     setTimeout(() => {
-      setPendingDistricts(selectedDistrictIds);
+      setPendingAdminUnitIds(selectedAdminUnitIds);
     }, 0);
-  }, [selectedDistrictIds]);
+  }, [selectedAdminUnitIds]);
 
-  const toggleDistrict = (district: CatalogDistrict) => {
-    const districtId = district.districtId
-    setPendingDistricts((current) =>
-      current.includes(districtId)
-        ? current.filter((item) => item !== districtId)
-        : [...current, districtId],
+  const toggleAdminUnit = (adminUnitId: number) => {
+    setPendingAdminUnitIds((current) =>
+      current.includes(adminUnitId)
+        ? current.filter((item) => item !== adminUnitId)
+        : [...current, adminUnitId],
     );
   };
 
   const handleApply = () => {
-    onSelectedDistrictsChange(pendingDistricts);
+    onSelectedAdminUnitsChange(pendingAdminUnitIds);
   };
 
   return (
@@ -43,50 +111,20 @@ export function FiltersPanel({
 
       <div className="flex min-h-0 flex-1 flex-col rounded-2xl bg-[#D9DDF2] p-4">
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="pb-4">
-            <button
-              type="button"
-              onClick={() => setIsDistrictOpen((open) => !open)}
-              className="flex w-full items-center justify-between text-sm font-bold text-black"
-            >
-              Район
-              <svg
-                className={`h-4 w-4 shrink-0 transition ${isDistrictOpen ? 'rotate-180' : ''}`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-
-            {isDistrictOpen ? (
-              <div className="mt-3 space-y-2.5">
-                {districts.length ? (
-                  districts.map((district) => (
-                    <label
-                      key={district.districtId}
-                      className="flex cursor-pointer items-center gap-2.5 text-sm text-black"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={pendingDistricts.includes(district.districtId)}
-                        onChange={() => toggleDistrict(district)}
-                        className="h-4 w-4 shrink-0 rounded-sm border border-black accent-black"
-                      />
-                      <span>{district.name}</span>
-                    </label>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-700">
-                    Райони зараз недоступні
-                  </p>
-                )}
-              </div>
-            ) : null}
-          </div>
+          <AdminUnitFilterGroup
+            title="Район"
+            units={districts}
+            emptyMessage="Райони зараз недоступні"
+            selectedIds={pendingAdminUnitIds}
+            onToggle={toggleAdminUnit}
+          />
+          <AdminUnitFilterGroup
+            title="Громада"
+            units={communities}
+            emptyMessage="Громади зараз недоступні"
+            selectedIds={pendingAdminUnitIds}
+            onToggle={toggleAdminUnit}
+          />
         </div>
 
         <button

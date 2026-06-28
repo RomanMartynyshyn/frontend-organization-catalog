@@ -3,8 +3,10 @@ export type CatalogCategory = {
   name: string;
 };
 
-export type CatalogDistrict = {
-  districtId: number;
+export type CatalogAdminUnit = {
+  adminUnitId: number;
+  parentId: number;
+  type: string | null;
   name: string;
 };
 
@@ -40,7 +42,7 @@ export type CatalogLocation = {
   postCode: string | null;
   latitude: number | string;
   longitude: number | string;
-  district?: string | null;
+  adminUnit?: string | null;
 };
 
 export type CatalogLocationInput = {
@@ -50,7 +52,7 @@ export type CatalogLocationInput = {
   postCode?: string;
   latitude: number | string;
   longitude: number | string;
-  districtId?: number;
+  adminUnitId?: number;
 };
 
 export type CreateOrganizationContacts = {
@@ -84,7 +86,7 @@ export type CatalogOrganization = {
 
 export type FetchOrganizationsParams = {
   categoryId?: number;
-  districtIds?: number[];
+  adminUnitIds?: number[];
   limit?: number;
   offset?: number;
   search?: string;

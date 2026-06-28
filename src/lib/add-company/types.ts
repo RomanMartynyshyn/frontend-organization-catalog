@@ -5,7 +5,7 @@ export type LocationFormState = {
   city: string;
   region: string;
   postCode: string;
-  districtId: number | null;
+  adminUnitId: number | null;
   latitude: string;
   longitude: string;
 };
@@ -34,7 +34,7 @@ export function createInitialLocation(): LocationFormState {
     city: DEFAULT_CITY,
     region: DEFAULT_REGION,
     postCode: '',
-    districtId: null,
+    adminUnitId: null,
     latitude: '',
     longitude: '',
   };

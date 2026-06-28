@@ -38,10 +38,10 @@ function collectDistricts(locations: CatalogLocation[]): string[] {
   const districts = new Set<string>();
 
   for (const location of locations) {
-    const district = location.district?.trim();
+    const adminUnit = location.adminUnit?.trim();
 
-    if (district) {
-      districts.add(district);
+    if (adminUnit) {
+      districts.add(adminUnit);
     }
   }
 
@@ -49,25 +49,25 @@ function collectDistricts(locations: CatalogLocation[]): string[] {
 }
 
 export type MapOrganizationOptions = {
-  activeDistrictNames?: string[];
+  activeAdminUnitNames?: string[];
 };
 
 function pickDisplayLocation(
   locations: CatalogLocation[],
-  activeDistrictNames?: string[],
+  activeAdminUnitNames?: string[],
 ): CatalogLocation | undefined {
   if (!locations.length) {
     return undefined;
   }
 
-  if (activeDistrictNames?.length) {
-    const activeDistricts = new Set(
-      activeDistrictNames.map((name) => name.trim()).filter(Boolean),
+  if (activeAdminUnitNames?.length) {
+    const activeAdminUnits = new Set(
+      activeAdminUnitNames.map((name) => name.trim()).filter(Boolean),
     );
     const matchingLocation = locations.find(
       (location) =>
-        location.district?.trim() &&
-        activeDistricts.has(location.district.trim()),
+        location.adminUnit?.trim() &&
+        activeAdminUnits.has(location.adminUnit.trim()),
     );
 
     if (matchingLocation) {
@@ -124,15 +124,15 @@ export function mapOrganizationToCompany(
     id: location.id,
     address: formatLocation(location),
     street: location.street?.trim() || formatLocation(location),
-    district: location.district?.trim() ?? null,
+    district: location.adminUnit?.trim() ?? null,
   }));
   const primaryCategory = org.categories[0];
   const displayLocation = pickDisplayLocation(
     org.locations,
-    options?.activeDistrictNames,
+    options?.activeAdminUnitNames,
   );
   const regions = collectDistricts(
-    options?.activeDistrictNames?.length && displayLocation
+    options?.activeAdminUnitNames?.length && displayLocation
       ? [displayLocation]
       : org.locations,
   );

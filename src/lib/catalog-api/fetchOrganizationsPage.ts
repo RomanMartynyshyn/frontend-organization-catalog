@@ -15,8 +15,8 @@ function buildOrganizationsParams(
     params.set('categoryId', query.categoryId);
   }
 
-  for (const districtId of query.districtIds) {
-    params.append('districtId', String(districtId));
+  for (const adminUnitId of query.adminUnitIds) {
+    params.append('adminUnitId', String(adminUnitId));
   }
 
   const normalizedSearch = query.search.trim();

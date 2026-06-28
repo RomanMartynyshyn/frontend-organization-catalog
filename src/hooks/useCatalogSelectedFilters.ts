@@ -3,7 +3,8 @@
 import { useMemo } from 'react';
 
 import type { CatalogFiltersQuery } from '@/lib/catalogSearchParams';
-import type { CatalogCategory, CatalogDistrict } from '@/types/catalog-api';
+import { formatAdminUnitShortName } from '@/lib/catalog-api/adminUnitHelpers';
+import type { CatalogAdminUnit, CatalogCategory } from '@/types/catalog-api';
 
 type SelectedFilter = {
   id: string;
@@ -20,24 +21,44 @@ type SetCatalogFilters = (
 
 type UseCatalogSelectedFiltersParams = {
   activeCategoryId: string | null;
-  selectedDistrictIds: number[];
+  selectedAdminUnitIds: number[];
   search: string;
   categories: CatalogCategory[];
-  districts: CatalogDistrict[];
+  districts: CatalogAdminUnit[];
+  communities: CatalogAdminUnit[];
   setCatalogFilters: SetCatalogFilters;
   handleCategorySelect: (id: string | null) => void;
-  handleSelectedDistrictsChange: (districtIds: number[]) => void;
+  handleSelectedAdminUnitsChange: (adminUnitIds: number[]) => void;
 };
+
+function buildAdminUnitFilterChips(
+  units: CatalogAdminUnit[],
+  prefix: string,
+  selectedAdminUnitIds: number[],
+  handleSelectedAdminUnitsChange: (adminUnitIds: number[]) => void,
+): SelectedFilter[] {
+  return units
+    .filter((unit) => selectedAdminUnitIds.includes(unit.adminUnitId))
+    .map((unit) => ({
+      id: `${prefix}-${unit.adminUnitId}`,
+      label: formatAdminUnitShortName(unit),
+      onRemove: () =>
+        handleSelectedAdminUnitsChange(
+          selectedAdminUnitIds.filter((item) => item !== unit.adminUnitId),
+        ),
+    }));
+}
 
 export function useCatalogSelectedFilters({
   activeCategoryId,
-  selectedDistrictIds,
+  selectedAdminUnitIds,
   search,
   categories,
   districts,
+  communities,
   setCatalogFilters,
   handleCategorySelect,
-  handleSelectedDistrictsChange,
+  handleSelectedAdminUnitsChange,
 }: UseCatalogSelectedFiltersParams) {
   const activeCategoryName = useMemo(() => {
     if (!activeCategoryId) {
@@ -60,18 +81,20 @@ export function useCatalogSelectedFilters({
       });
     }
 
-    districts
-      .filter((district) => selectedDistrictIds.includes(district.districtId))
-      .forEach((district) => {
-        filters.push({
-          id: district.districtId.toString(),
-          label: district.name,
-          onRemove: () =>
-            handleSelectedDistrictsChange(
-              selectedDistrictIds.filter((item) => item !== district.districtId),
-            ),
-        });
-      });
+    filters.push(
+      ...buildAdminUnitFilterChips(
+        districts,
+        'district',
+        selectedAdminUnitIds,
+        handleSelectedAdminUnitsChange,
+      ),
+      ...buildAdminUnitFilterChips(
+        communities,
+        'community',
+        selectedAdminUnitIds,
+        handleSelectedAdminUnitsChange,
+      ),
+    );
 
     const normalizedSearch = search.trim();
 
@@ -89,18 +112,19 @@ export function useCatalogSelectedFilters({
   }, [
     activeCategoryId,
     activeCategoryName,
+    communities,
     districts,
     handleCategorySelect,
-    handleSelectedDistrictsChange,
+    handleSelectedAdminUnitsChange,
     search,
-    selectedDistrictIds,
+    selectedAdminUnitIds,
     setCatalogFilters,
   ]);
 
   const resetFilters = () => {
     void setCatalogFilters({
       categoryId: null,
-      districtIds: [],
+      adminUnitIds: [],
       search: '',
     });
   };

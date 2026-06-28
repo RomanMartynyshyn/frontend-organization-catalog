@@ -7,7 +7,7 @@ import { SelectedFilters } from '@/components/SelectedFilters';
 import { useCatalogOrganizations } from '@/hooks/useCatalogOrganizations';
 import { useCatalogSelectedFilters } from '@/hooks/useCatalogSelectedFilters';
 import type { CatalogFiltersQuery } from '@/lib/catalogSearchParams';
-import type { CatalogCategory, CatalogDistrict } from '@/types/catalog-api';
+import type { CatalogAdminUnit, CatalogCategory } from '@/types/catalog-api';
 import type { CompanyListItem } from '@/types/company';
 
 type CatalogHomeClientProps = {
@@ -15,7 +15,8 @@ type CatalogHomeClientProps = {
   initialOrganizations: CompanyListItem[];
   initialHasMore: boolean;
   categories: CatalogCategory[];
-  districts: CatalogDistrict[];
+  districts: CatalogAdminUnit[];
+  communities: CatalogAdminUnit[];
 };
 
 export function CatalogHomeClient({
@@ -24,10 +25,11 @@ export function CatalogHomeClient({
   initialHasMore,
   categories,
   districts,
+  communities,
 }: CatalogHomeClientProps) {
   const {
     activeCategoryId,
-    selectedDistrictIds,
+    selectedAdminUnitIds,
     search,
     organizations,
     hasMore,
@@ -35,7 +37,7 @@ export function CatalogHomeClient({
     isLoadingMore,
     setCatalogFilters,
     handleCategorySelect,
-    handleSelectedDistrictsChange,
+    handleSelectedAdminUnitsChange,
     handleLoadMore,
     filtersKey,
   } = useCatalogOrganizations({
@@ -43,17 +45,19 @@ export function CatalogHomeClient({
     initialOrganizations,
     initialHasMore,
     districts,
+    communities,
   });
 
   const { selectedFilters, resetFilters } = useCatalogSelectedFilters({
     activeCategoryId,
-    selectedDistrictIds,
+    selectedAdminUnitIds,
     search,
     categories,
     districts,
+    communities,
     setCatalogFilters,
     handleCategorySelect,
-    handleSelectedDistrictsChange,
+    handleSelectedAdminUnitsChange,
   });
 
   return (
@@ -70,8 +74,9 @@ export function CatalogHomeClient({
 
       <CatalogBrowseSection
         districts={districts}
-        selectedDistrictIds={selectedDistrictIds}
-        onSelectedDistrictsChange={handleSelectedDistrictsChange}
+        communities={communities}
+        selectedAdminUnitIds={selectedAdminUnitIds}
+        onSelectedAdminUnitsChange={handleSelectedAdminUnitsChange}
         organizations={organizations}
         isLoading={isLoading}
         hasMore={hasMore}
