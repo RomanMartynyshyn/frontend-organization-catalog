@@ -578,19 +578,48 @@ export default function AddCompanyForm() {
                         clearFieldError(streetKey);
                       }}
                       onManualEdit={() => {
-                        updateLocationField(setFormState, locationIndex, 'latitude', '');
-                        updateLocationField(setFormState, locationIndex, 'longitude', '');
-                      }}
-                      onAddressSelect={({ street, latitude, longitude }) => {
                         setFormState((current) => ({
                           ...current,
                           locations: current.locations.map((item, index) =>
                             index === locationIndex
-                              ? { ...item, street, latitude, longitude }
+                              ? {
+                                  ...item,
+                                  latitude: '',
+                                  longitude: '',
+                                  districtAdminUnitId: null,
+                                  communityAdminUnitId: null,
+                                }
+                              : item,
+                          ),
+                        }));
+                      }}
+                      onAddressSelect={({
+                        street,
+                        latitude,
+                        longitude,
+                        postCode,
+                        districtAdminUnitId,
+                        communityAdminUnitId,
+                      }) => {
+                        setFormState((current) => ({
+                          ...current,
+                          locations: current.locations.map((item, index) =>
+                            index === locationIndex
+                              ? {
+                                  ...item,
+                                  street,
+                                  latitude,
+                                  longitude,
+                                  postCode: postCode?.trim() || item.postCode,
+                                  districtAdminUnitId: districtAdminUnitId ?? null,
+                                  communityAdminUnitId: communityAdminUnitId ?? null,
+                                }
                               : item,
                           ),
                         }));
                         clearFieldError(streetKey);
+                        clearFieldError(postCodeKey);
+                        clearFieldError(adminUnitKey);
                       }}
                     />
                   </FormField>
@@ -630,15 +659,26 @@ export default function AddCompanyForm() {
                   >
                     <select
                       id={`company-district-${locationIndex}`}
-                      value={getAdminUnitSelectValue(location.adminUnitId, districts)}
+                      value={getAdminUnitSelectValue(
+                        location.districtAdminUnitId,
+                        districts,
+                      )}
                       onChange={(event) => {
                         const value = event.target.value;
                         updateLocationField(
                           setFormState,
                           locationIndex,
-                          'adminUnitId',
+                          'districtAdminUnitId',
                           value ? Number(value) : null,
                         );
+                        if (value) {
+                          updateLocationField(
+                            setFormState,
+                            locationIndex,
+                            'communityAdminUnitId',
+                            null,
+                          );
+                        }
                         clearFieldError(adminUnitKey);
                       }}
                       disabled={isDistrictsLoading || isDistrictsError}
@@ -663,15 +703,26 @@ export default function AddCompanyForm() {
                   >
                     <select
                       id={`company-community-${locationIndex}`}
-                      value={getAdminUnitSelectValue(location.adminUnitId, communities)}
+                      value={getAdminUnitSelectValue(
+                        location.communityAdminUnitId,
+                        communities,
+                      )}
                       onChange={(event) => {
                         const value = event.target.value;
                         updateLocationField(
                           setFormState,
                           locationIndex,
-                          'adminUnitId',
+                          'communityAdminUnitId',
                           value ? Number(value) : null,
                         );
+                        if (value) {
+                          updateLocationField(
+                            setFormState,
+                            locationIndex,
+                            'districtAdminUnitId',
+                            null,
+                          );
+                        }
                         clearFieldError(adminUnitKey);
                       }}
                       disabled={isCommunitiesLoading || isCommunitiesError}

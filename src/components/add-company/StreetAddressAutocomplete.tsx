@@ -20,6 +20,9 @@ type StreetAddressAutocompleteProps = {
     street: string;
     latitude: string;
     longitude: string;
+    postCode?: string | null;
+    districtAdminUnitId?: number | null;
+    communityAdminUnitId?: number | null;
   }) => void;
   onManualEdit: () => void;
 };
@@ -103,6 +106,9 @@ export function StreetAddressAutocomplete({
       street: suggestion.street,
       latitude: String(suggestion.latitude),
       longitude: String(suggestion.longitude),
+      postCode: suggestion.postCode,
+      districtAdminUnitId: suggestion.districtAdminUnitId ?? null,
+      communityAdminUnitId: suggestion.communityAdminUnitId ?? null,
     });
     setIsOpen(false);
     setSuggestions([]);

@@ -1,4 +1,5 @@
 import { WEEKDAY_LABELS } from '@/lib/add-company/constants';
+import { resolveLocationAdminUnitId } from '@/lib/geocode/matchAdminUnits';
 import type { AddCompanyFormState, FieldErrors } from '@/lib/add-company/types';
 import type { CreateOrganizationPayload } from '@/types/catalog-api';
 
@@ -141,7 +142,7 @@ export function buildCreateOrganizationPayload(
       postCode: location.postCode.trim() || undefined,
       latitude: Number(location.latitude),
       longitude: Number(location.longitude),
-      adminUnitId: location.adminUnitId ?? undefined,
+      adminUnitId: resolveLocationAdminUnitId(location),
     })),
   };
 
