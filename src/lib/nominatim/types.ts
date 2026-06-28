@@ -28,6 +28,7 @@ export type GeocodeSuggestion = {
   street: string;
   latitude: number;
   longitude: number;
+  city?: string | null;
   postCode?: string | null;
   districtAdminUnitId?: number | null;
   communityAdminUnitId?: number | null;
