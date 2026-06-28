@@ -4,6 +4,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useQueryStates } from 'nuqs';
 import { useCallback, useMemo } from 'react';
 
+import { mergeCatalogAdminUnits } from '@/lib/catalog-api/adminUnitHelpers';
 import {
   fetchOrganizationsInfinitePage,
   organizationsQueryKeys,
@@ -14,7 +15,7 @@ import {
 } from '@/lib/catalogSearchParams';
 import { catalogSearchParsers } from '@/lib/catalogSearchParsers';
 import { catalogSearchUrlKeys } from '@/lib/catalogSearchUrlKeys';
-import type { CatalogDistrict } from '@/types/catalog-api';
+import type { CatalogAdminUnit } from '@/types/catalog-api';
 import type { CompanyListItem } from '@/types/company';
 
 const SSR_STALE_TIME_MS = 60_000;
@@ -23,7 +24,8 @@ type UseCatalogOrganizationsParams = {
   initialFilters: CatalogFiltersQuery;
   initialOrganizations: CompanyListItem[];
   initialHasMore: boolean;
-  districts: CatalogDistrict[];
+  districts: CatalogAdminUnit[];
+  communities: CatalogAdminUnit[];
 };
 
 export function useCatalogOrganizations({
@@ -31,11 +33,17 @@ export function useCatalogOrganizations({
   initialOrganizations,
   initialHasMore,
   districts,
+  communities,
 }: UseCatalogOrganizationsParams) {
+  const adminUnits = useMemo(
+    () => mergeCatalogAdminUnits(districts, communities),
+    [communities, districts],
+  );
+
   const [
     {
       categoryId: activeCategoryId,
-      districtIds: selectedDistrictIds,
+      adminUnitIds: selectedAdminUnitIds,
       search,
     },
     setCatalogFilters,
@@ -46,10 +54,10 @@ export function useCatalogOrganizations({
   const currentFilters = useMemo<CatalogFiltersQuery>(
     () => ({
       categoryId: activeCategoryId,
-      districtIds: selectedDistrictIds,
+      adminUnitIds: selectedAdminUnitIds,
       search,
     }),
-    [activeCategoryId, search, selectedDistrictIds],
+    [activeCategoryId, search, selectedAdminUnitIds],
   );
 
   const currentFiltersKey = useMemo(
@@ -94,7 +102,7 @@ export function useCatalogOrganizations({
   } = useInfiniteQuery({
     queryKey: organizationsQueryKeys.list(currentFilters),
     queryFn: ({ pageParam }) =>
-      fetchOrganizationsInfinitePage(currentFilters, pageParam, districts),
+      fetchOrganizationsInfinitePage(currentFilters, pageParam, adminUnits),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _pages, lastPageParam) =>
       lastPage.hasMore ? lastPageParam + 1 : undefined,
@@ -110,9 +118,9 @@ export function useCatalogOrganizations({
   const isLoading = isPending || (isFetching && !isFetchingNextPage);
   const isLoadingMore = isFetchingNextPage;
 
-  const handleSelectedDistrictsChange = useCallback(
-    (districtIds: number[]) => {
-      void setCatalogFilters({ districtIds });
+  const handleSelectedAdminUnitsChange = useCallback(
+    (adminUnitIds: number[]) => {
+      void setCatalogFilters({ adminUnitIds });
     },
     [setCatalogFilters],
   );
@@ -134,7 +142,7 @@ export function useCatalogOrganizations({
 
   return {
     activeCategoryId,
-    selectedDistrictIds,
+    selectedAdminUnitIds,
     search,
     organizations,
     hasMore: hasNextPage ?? false,
@@ -143,7 +151,7 @@ export function useCatalogOrganizations({
     filtersKey: currentFiltersKey,
     setCatalogFilters,
     handleCategorySelect,
-    handleSelectedDistrictsChange,
+    handleSelectedAdminUnitsChange,
     handleLoadMore,
   };
 }

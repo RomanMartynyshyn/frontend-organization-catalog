@@ -4,6 +4,7 @@ import {
   NOMINATIM_BASE_URL,
   NOMINATIM_SEARCH_LIMIT,
 } from '@/lib/nominatim/constants';
+import { enrichGeocodeSuggestions } from '@/lib/geocode/enrichGeocodeSuggestions';
 import type {
   GeocodeSuggestion,
   NominatimSearchResult,
@@ -74,6 +75,7 @@ function mapNominatimResult(result: NominatimSearchResult): GeocodeSuggestion | 
     street,
     latitude,
     longitude,
+    postCode: result.address?.postcode?.trim() || null,
   };
 }
 
@@ -112,7 +114,9 @@ export async function searchKryvyiRihAddresses(
 
   const data = (await response.json()) as NominatimSearchResult[];
 
-  return data
+  const suggestions = data
     .map(mapNominatimResult)
     .filter((item): item is GeocodeSuggestion => item !== null);
+
+  return enrichGeocodeSuggestions(suggestions, data);
 }

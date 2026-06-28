@@ -45,7 +45,7 @@ function formatLocation(organization: CatalogOrganization): string {
     return '—';
   }
 
-  const parts = [location.street, location.city, location.district]
+  const parts = [location.street, location.city, location.adminUnit]
     .filter(Boolean)
     .map((part) => part?.trim())
     .filter(Boolean);

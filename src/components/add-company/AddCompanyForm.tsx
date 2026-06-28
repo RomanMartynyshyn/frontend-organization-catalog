@@ -28,11 +28,12 @@ import {
   type LocationFormState,
 } from '@/lib/add-company/types';
 import { organizationsQueryKeys } from '@/lib/catalog-api/organizationsQuery';
+import { getAdminUnitSelectValue, formatAdminUnitShortName } from '@/lib/catalog-api/adminUnitHelpers';
 import { cn } from '@/lib/cn';
 import type {
   ApiErrorResponse,
   CatalogCategory,
-  CatalogDistrict,
+  CatalogAdminUnit,
   CatalogOrganization,
   CreateOrganizationPayload,
 } from '@/types/catalog-api';
@@ -47,14 +48,24 @@ async function fetchCategories(): Promise<CatalogCategory[]> {
   return (await response.json()) as CatalogCategory[];
 }
 
-async function fetchDistricts(): Promise<CatalogDistrict[]> {
+async function fetchDistrictAdminUnits(): Promise<CatalogAdminUnit[]> {
   const response = await fetch('/api/districts');
 
   if (!response.ok) {
     throw new Error('Failed to fetch districts');
   }
 
-  return (await response.json()) as CatalogDistrict[];
+  return (await response.json()) as CatalogAdminUnit[];
+}
+
+async function fetchCommunityAdminUnits(): Promise<CatalogAdminUnit[]> {
+  const response = await fetch('/api/communities');
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch communities');
+  }
+
+  return (await response.json()) as CatalogAdminUnit[];
 }
 
 async function submitOrganization(
@@ -211,7 +222,16 @@ export default function AddCompanyForm() {
     isError: isDistrictsError,
   } = useQuery({
     queryKey: ['districts'],
-    queryFn: fetchDistricts,
+    queryFn: fetchDistrictAdminUnits,
+  });
+
+  const {
+    data: communities = [],
+    isLoading: isCommunitiesLoading,
+    isError: isCommunitiesError,
+  } = useQuery({
+    queryKey: ['communities'],
+    queryFn: fetchCommunityAdminUnits,
   });
 
   const createOrganizationMutation = useMutation({
@@ -515,10 +535,10 @@ export default function AddCompanyForm() {
             {formState.locations.map((location, locationIndex) => {
               const streetKey = `locations.${locationIndex}.street`;
               const postCodeKey = `locations.${locationIndex}.postCode`;
-              const districtKey = `locations.${locationIndex}.districtId`;
+              const adminUnitKey = `locations.${locationIndex}.adminUnitId`;
               const streetError = fieldErrors[streetKey];
               const postCodeError = fieldErrors[postCodeKey];
-              const districtError = fieldErrors[districtKey];
+              const adminUnitError = fieldErrors[adminUnitKey];
 
               return (
                 <div
@@ -558,19 +578,48 @@ export default function AddCompanyForm() {
                         clearFieldError(streetKey);
                       }}
                       onManualEdit={() => {
-                        updateLocationField(setFormState, locationIndex, 'latitude', '');
-                        updateLocationField(setFormState, locationIndex, 'longitude', '');
-                      }}
-                      onAddressSelect={({ street, latitude, longitude }) => {
                         setFormState((current) => ({
                           ...current,
                           locations: current.locations.map((item, index) =>
                             index === locationIndex
-                              ? { ...item, street, latitude, longitude }
+                              ? {
+                                  ...item,
+                                  latitude: '',
+                                  longitude: '',
+                                  districtAdminUnitId: null,
+                                  communityAdminUnitId: null,
+                                }
+                              : item,
+                          ),
+                        }));
+                      }}
+                      onAddressSelect={({
+                        street,
+                        latitude,
+                        longitude,
+                        postCode,
+                        districtAdminUnitId,
+                        communityAdminUnitId,
+                      }) => {
+                        setFormState((current) => ({
+                          ...current,
+                          locations: current.locations.map((item, index) =>
+                            index === locationIndex
+                              ? {
+                                  ...item,
+                                  street,
+                                  latitude,
+                                  longitude,
+                                  postCode: postCode?.trim() || item.postCode,
+                                  districtAdminUnitId: districtAdminUnitId ?? null,
+                                  communityAdminUnitId: communityAdminUnitId ?? null,
+                                }
                               : item,
                           ),
                         }));
                         clearFieldError(streetKey);
+                        clearFieldError(postCodeKey);
+                        clearFieldError(adminUnitKey);
                       }}
                     />
                   </FormField>
@@ -606,31 +655,86 @@ export default function AddCompanyForm() {
                   <FormField
                     id={`company-district-${locationIndex}`}
                     label="Район"
-                    error={districtError}
+                    error={adminUnitError}
                   >
                     <select
                       id={`company-district-${locationIndex}`}
-                      value={location.districtId ?? ''}
+                      value={getAdminUnitSelectValue(
+                        location.districtAdminUnitId,
+                        districts,
+                      )}
                       onChange={(event) => {
                         const value = event.target.value;
                         updateLocationField(
                           setFormState,
                           locationIndex,
-                          'districtId',
+                          'districtAdminUnitId',
                           value ? Number(value) : null,
                         );
-                        clearFieldError(districtKey);
+                        if (value) {
+                          updateLocationField(
+                            setFormState,
+                            locationIndex,
+                            'communityAdminUnitId',
+                            null,
+                          );
+                        }
+                        clearFieldError(adminUnitKey);
                       }}
                       disabled={isDistrictsLoading || isDistrictsError}
                       className={cn(
                         addCompanySelectClassName,
-                        fieldErrorClassName(districtError),
+                        fieldErrorClassName(adminUnitError),
                       )}
                     >
                       <option value="">Обрати район</option>
-                      {districts.map((district) => (
-                        <option key={district.districtId} value={district.districtId}>
-                          {district.name}
+                      {districts.map((unit) => (
+                        <option key={unit.adminUnitId} value={unit.adminUnitId}>
+                          {formatAdminUnitShortName(unit)}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+
+                  <FormField
+                    id={`company-community-${locationIndex}`}
+                    label="Громада"
+                    error={adminUnitError}
+                  >
+                    <select
+                      id={`company-community-${locationIndex}`}
+                      value={getAdminUnitSelectValue(
+                        location.communityAdminUnitId,
+                        communities,
+                      )}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        updateLocationField(
+                          setFormState,
+                          locationIndex,
+                          'communityAdminUnitId',
+                          value ? Number(value) : null,
+                        );
+                        if (value) {
+                          updateLocationField(
+                            setFormState,
+                            locationIndex,
+                            'districtAdminUnitId',
+                            null,
+                          );
+                        }
+                        clearFieldError(adminUnitKey);
+                      }}
+                      disabled={isCommunitiesLoading || isCommunitiesError}
+                      className={cn(
+                        addCompanySelectClassName,
+                        fieldErrorClassName(adminUnitError),
+                      )}
+                    >
+                      <option value="">Обрати громаду</option>
+                      {communities.map((unit) => (
+                        <option key={unit.adminUnitId} value={unit.adminUnitId}>
+                          {formatAdminUnitShortName(unit)}
                         </option>
                       ))}
                     </select>
@@ -650,6 +754,10 @@ export default function AddCompanyForm() {
 
             {isDistrictsError ? (
               <p className="text-xs text-red-600">Не вдалося завантажити райони.</p>
+            ) : null}
+
+            {isCommunitiesError ? (
+              <p className="text-xs text-red-600">Не вдалося завантажити громади.</p>
             ) : null}
 
             <div className="space-y-2">

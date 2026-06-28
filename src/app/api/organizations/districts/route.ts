@@ -9,7 +9,7 @@ export async function GET() {
     const adminUnits = await fetchDistrictAdminUnits();
     return NextResponse.json(adminUnits);
   } catch (error) {
-    console.error('[GET /api/districts]', error);
+    console.error('[GET /api/organizations/districts]', error);
     return NextResponse.json(
       { message: 'Failed to fetch admin units' },
       { status: 502 },

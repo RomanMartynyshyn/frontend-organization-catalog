@@ -1,6 +1,11 @@
 import { CatalogHomeClient } from '@/app/(catalog)/CatalogHomeClient';
-import { getActiveDistrictNames } from '@/lib/catalog-api/activeDistrictNames';
-import { fetchCategories, fetchDistricts } from '@/lib/catalog-api/client';
+import { getActiveAdminUnitNames } from '@/lib/catalog-api/activeDistrictNames';
+import { mergeCatalogAdminUnits } from '@/lib/catalog-api/adminUnitHelpers';
+import {
+  fetchCategories,
+  fetchCommunityAdminUnits,
+  fetchDistrictAdminUnits,
+} from '@/lib/catalog-api/client';
 import { getCompanies } from '@/lib/companies/getCompanies';
 import { type CatalogFiltersQuery } from '@/lib/catalogSearchParams';
 import { catalogSearchParsers } from '@/lib/catalogSearchParsers.server';
@@ -33,21 +38,24 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const initialFilters = await loadCatalogSearchParams(searchParams);
   const categoryId = parseCategoryId(initialFilters.categoryId);
 
-  const [districts, categories] = await Promise.all([
-    fetchDistricts(),
+  const [districts, communities, categories] = await Promise.all([
+    fetchDistrictAdminUnits(),
+    fetchCommunityAdminUnits(),
     fetchCategories(),
   ]);
 
-  const activeDistrictNames = getActiveDistrictNames(
-    districts,
-    initialFilters.districtIds,
+  const adminUnits = mergeCatalogAdminUnits(districts, communities);
+
+  const activeAdminUnitNames = getActiveAdminUnitNames(
+    adminUnits,
+    initialFilters.adminUnitIds,
   );
 
   const { organizations, hasMore } = await getCompanies({
     categoryId,
-    districtIds: initialFilters.districtIds,
+    adminUnitIds: initialFilters.adminUnitIds,
     search: initialFilters.search.trim() || undefined,
-    activeDistrictNames,
+    activeAdminUnitNames,
   });
 
   return (
@@ -57,6 +65,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       initialHasMore={hasMore}
       categories={categories}
       districts={districts}
+      communities={communities}
     />
   );
 }

@@ -1,6 +1,7 @@
 import { ORGANIZATIONS_PAGE_SIZE } from '@/lib/constants';
 import {
-  CatalogCategory, CatalogDistrict,
+  CatalogAdminUnit,
+  CatalogCategory,
   CatalogOrganization,
   CreateOrganizationPayload,
   FetchOrganizationsParams,
@@ -114,9 +115,19 @@ export async function fetchCategories(): Promise<CatalogCategory[]> {
   return data;
 }
 
-export async function fetchDistricts(): Promise<CatalogDistrict[]> {
-  const { data } = await catalogFetch<CatalogDistrict[]>('/api/districts');
+export async function fetchAdminUnits(): Promise<CatalogAdminUnit[]> {
+  const { data } = await catalogFetch<CatalogAdminUnit[]>('/api/admin-units');
   return data ?? [];
+}
+
+export async function fetchDistrictAdminUnits(): Promise<CatalogAdminUnit[]> {
+  const adminUnits = await fetchAdminUnits();
+  return adminUnits.filter((unit) => unit.type === 'district');
+}
+
+export async function fetchCommunityAdminUnits(): Promise<CatalogAdminUnit[]> {
+  const adminUnits = await fetchAdminUnits();
+  return adminUnits.filter((unit) => unit.type === 'community');
 }
 
 export async function createOrganization(
@@ -135,7 +146,7 @@ export async function fetchOrganizations(
 ): Promise<PaginatedOrganizations> {
   const {
     categoryId,
-    districtIds = [],
+    adminUnitIds = [],
     limit = ORGANIZATIONS_PAGE_SIZE,
     offset = 0,
     search,
@@ -155,8 +166,8 @@ export async function fetchOrganizations(
     searchParams.set('status', status);
   }
 
-  for (const districtId of districtIds) {
-    searchParams.append('districtId', districtId.toString());
+  for (const adminUnitId of adminUnitIds) {
+    searchParams.append('adminUnitId', adminUnitId.toString());
   }
 
   const normalizedSearch = search?.trim();

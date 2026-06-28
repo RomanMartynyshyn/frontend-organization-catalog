@@ -6,6 +6,12 @@ export type NominatimAddress = {
   city?: string;
   town?: string;
   village?: string;
+  suburb?: string;
+  borough?: string;
+  city_district?: string;
+  municipality?: string;
+  district?: string;
+  postcode?: string;
 };
 
 export type NominatimSearchResult = {
@@ -22,4 +28,7 @@ export type GeocodeSuggestion = {
   street: string;
   latitude: number;
   longitude: number;
+  postCode?: string | null;
+  districtAdminUnitId?: number | null;
+  communityAdminUnitId?: number | null;
 };

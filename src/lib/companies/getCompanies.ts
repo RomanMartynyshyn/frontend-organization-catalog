@@ -18,13 +18,13 @@ export type GetCompaniesParams = FetchOrganizationsParams & MapOrganizationOptio
 export async function getCompanies(
   params: GetCompaniesParams = {},
 ): Promise<CompaniesPage> {
-  const { activeDistrictNames, ...fetchParams } = params;
+  const { activeAdminUnitNames, ...fetchParams } = params;
   const { items, hasMore } = await fetchOrganizations(fetchParams);
 
   return {
     organizations: toCompanyListItems(
       items.map((item) =>
-        mapOrganizationToCompany(item, { activeDistrictNames }),
+        mapOrganizationToCompany(item, { activeAdminUnitNames }),
       ),
       1,
     ),
@@ -35,7 +35,7 @@ export async function getCompanies(
 export async function getCompaniesUpToPage(
   params: GetCompaniesParams & { page: number },
 ): Promise<CompaniesPage> {
-  const { page, activeDistrictNames, ...fetchParams } = params;
+  const { page, activeAdminUnitNames, ...fetchParams } = params;
   const organizations: CompanyListItem[] = [];
   let hasMore = false;
 
@@ -50,7 +50,7 @@ export async function getCompaniesUpToPage(
     organizations.push(
       ...toCompanyListItems(
         items.map((item) =>
-          mapOrganizationToCompany(item, { activeDistrictNames }),
+          mapOrganizationToCompany(item, { activeAdminUnitNames }),
         ),
         pageNumber,
       ),

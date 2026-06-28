@@ -71,8 +71,8 @@ function validateLocations(
     const postCode = location.postCode?.trim();
     const latitude = Number(location.latitude);
     const longitude = Number(location.longitude);
-    const districtId =
-      location.districtId !== undefined ? Number(location.districtId) : undefined;
+    const adminUnitId =
+      location.adminUnitId !== undefined ? Number(location.adminUnitId) : undefined;
 
     if (!city) {
       errors.push({
@@ -135,11 +135,11 @@ function validateLocations(
     }
 
     if (
-      districtId !== undefined &&
-      (!Number.isInteger(districtId) || districtId <= 0)
+      adminUnitId !== undefined &&
+      (!Number.isInteger(adminUnitId) || adminUnitId <= 0)
     ) {
       errors.push({
-        field: `${prefix}.districtId`,
+        field: `${prefix}.adminUnitId`,
         message: 'Невірний район',
       });
     }
@@ -162,7 +162,7 @@ function validateLocations(
         ...(postCode ? { postCode } : {}),
         latitude,
         longitude,
-        ...(districtId ? { districtId } : {}),
+        ...(adminUnitId ? { adminUnitId } : {}),
       });
     }
   });
@@ -176,7 +176,7 @@ function validateLocations(
 
 export async function GET(request: NextRequest) {
   const categoryIdParam = request.nextUrl.searchParams.get('categoryId');
-  const districtParams = request.nextUrl.searchParams.getAll('districtId');
+  const adminUnitParams = request.nextUrl.searchParams.getAll('adminUnitId');
   const limitParam = request.nextUrl.searchParams.get('limit');
   const offsetParam = request.nextUrl.searchParams.get('offset');
   const searchParam = request.nextUrl.searchParams.get('search')?.trim();
@@ -194,7 +194,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const districtIds = districtParams.map(Number);
+  const adminUnitIds = adminUnitParams.map(Number);
 
   const limit = parsePositiveInt(limitParam, ORGANIZATIONS_PAGE_SIZE);
   const offset = parsePositiveInt(offsetParam, 0);
@@ -209,7 +209,7 @@ export async function GET(request: NextRequest) {
   try {
     const result = await fetchOrganizations({
       categoryId,
-      districtIds: districtIds,
+      adminUnitIds,
       limit,
       offset,
       search: searchParam || undefined,

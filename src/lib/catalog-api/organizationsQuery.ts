@@ -1,4 +1,4 @@
-import { getActiveDistrictNames } from '@/lib/catalog-api/activeDistrictNames';
+import { getActiveAdminUnitNames } from '@/lib/catalog-api/activeDistrictNames';
 import { fetchOrganizationsChunk } from '@/lib/catalog-api/fetchOrganizationsPage';
 import { mapOrganizationToCompany } from '@/lib/catalog-api/mapToCompany';
 import { toCompanyListItems } from '@/lib/companies/companyListItems';
@@ -6,7 +6,7 @@ import {
   serializeCatalogFilters,
   type CatalogFiltersQuery,
 } from '@/lib/catalogSearchParams';
-import type { CatalogDistrict } from '@/types/catalog-api';
+import type { CatalogAdminUnit } from '@/types/catalog-api';
 import type { CompanyListItem } from '@/types/company';
 
 export type OrganizationsInfinitePage = {
@@ -27,11 +27,11 @@ export const organizationsQueryKeys = {
 export async function fetchOrganizationsInfinitePage(
   filters: CatalogFiltersQuery,
   page: number,
-  districts: CatalogDistrict[],
+  adminUnits: CatalogAdminUnit[],
 ): Promise<OrganizationsInfinitePage> {
-  const activeDistrictNames = getActiveDistrictNames(
-    districts,
-    filters.districtIds,
+  const activeAdminUnitNames = getActiveAdminUnitNames(
+    adminUnits,
+    filters.adminUnitIds,
   );
   const { items, hasMore } = await fetchOrganizationsChunk(
     { ...filters, page },
@@ -41,7 +41,7 @@ export async function fetchOrganizationsInfinitePage(
   return {
     organizations: toCompanyListItems(
       items.map((item) =>
-        mapOrganizationToCompany(item, { activeDistrictNames }),
+        mapOrganizationToCompany(item, { activeAdminUnitNames }),
       ),
       page,
     ),
