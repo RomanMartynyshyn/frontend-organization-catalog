@@ -190,9 +190,9 @@ function validateLocation(
   const region = location.region.trim();
 
   if (!city) {
-    errors[`${prefix}.city`] = 'Введіть місто';
+    errors[`${prefix}.city`] = 'Введіть населений пункт';
   } else if (city.length > 50) {
-    errors[`${prefix}.city`] = 'Місто не може перевищувати 50 символів';
+    errors[`${prefix}.city`] = 'Населений пункт не може перевищувати 50 символів';
   }
 
   if (!region) {

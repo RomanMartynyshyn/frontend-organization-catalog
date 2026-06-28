@@ -1,4 +1,5 @@
 import { resolveAdminUnitIdsFromAddress } from '@/lib/geocode/matchAdminUnits';
+import { resolveSettlementFromAddress } from '@/lib/geocode/resolveSettlementFromAddress';
 import { fetchAdminUnits } from '@/lib/catalog-api/client';
 import type { GeocodeSuggestion } from '@/lib/nominatim/types';
 import type { NominatimSearchResult } from '@/lib/nominatim/types';
@@ -20,15 +21,13 @@ export async function enrichGeocodeSuggestions(
   );
 
   return suggestions.map((suggestion) => {
+    const address = addressByPlaceId.get(suggestion.id);
     const { districtAdminUnitId, communityAdminUnitId } =
-      resolveAdminUnitIdsFromAddress(
-        addressByPlaceId.get(suggestion.id),
-        districts,
-        communities,
-      );
+      resolveAdminUnitIdsFromAddress(address, districts, communities);
 
     return {
       ...suggestion,
+      city: resolveSettlementFromAddress(address),
       districtAdminUnitId,
       communityAdminUnitId,
     };

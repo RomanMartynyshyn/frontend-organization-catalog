@@ -13,7 +13,7 @@ import {
 import { StepIndicator } from '@/components/add-company/StepIndicator';
 import { StreetAddressAutocomplete } from '@/components/add-company/StreetAddressAutocomplete';
 import { Button } from '@/components/ui/button';
-import { WEEKDAY_LABELS } from '@/lib/add-company/constants';
+import { DEFAULT_CITY, WEEKDAY_LABELS } from '@/lib/add-company/constants';
 import {
   buildCreateOrganizationPayload,
   mapApiFieldToFormField,
@@ -534,9 +534,11 @@ export default function AddCompanyForm() {
           <div className="space-y-5">
             {formState.locations.map((location, locationIndex) => {
               const streetKey = `locations.${locationIndex}.street`;
+              const cityKey = `locations.${locationIndex}.city`;
               const postCodeKey = `locations.${locationIndex}.postCode`;
               const adminUnitKey = `locations.${locationIndex}.adminUnitId`;
               const streetError = fieldErrors[streetKey];
+              const cityError = fieldErrors[cityKey];
               const postCodeError = fieldErrors[postCodeKey];
               const adminUnitError = fieldErrors[adminUnitKey];
 
@@ -584,6 +586,7 @@ export default function AddCompanyForm() {
                             index === locationIndex
                               ? {
                                   ...item,
+                                  city: DEFAULT_CITY,
                                   latitude: '',
                                   longitude: '',
                                   districtAdminUnitId: null,
@@ -592,11 +595,13 @@ export default function AddCompanyForm() {
                               : item,
                           ),
                         }));
+                        clearFieldError(cityKey);
                       }}
                       onAddressSelect={({
                         street,
                         latitude,
                         longitude,
+                        city,
                         postCode,
                         districtAdminUnitId,
                         communityAdminUnitId,
@@ -608,6 +613,7 @@ export default function AddCompanyForm() {
                               ? {
                                   ...item,
                                   street,
+                                  city: city?.trim() || item.city,
                                   latitude,
                                   longitude,
                                   postCode: postCode?.trim() || item.postCode,
@@ -618,6 +624,7 @@ export default function AddCompanyForm() {
                           ),
                         }));
                         clearFieldError(streetKey);
+                        clearFieldError(cityKey);
                         clearFieldError(postCodeKey);
                         clearFieldError(adminUnitKey);
                       }}
@@ -648,6 +655,34 @@ export default function AddCompanyForm() {
                       className={cn(
                         addCompanyInputClassName,
                         fieldErrorClassName(postCodeError),
+                      )}
+                    />
+                  </FormField>
+
+                  <FormField
+                    id={`company-city-${locationIndex}`}
+                    label="Населений пункт"
+                    required
+                    error={cityError}
+                  >
+                    <input
+                      id={`company-city-${locationIndex}`}
+                      type="text"
+                      maxLength={50}
+                      value={location.city}
+                      onChange={(event) => {
+                        updateLocationField(
+                          setFormState,
+                          locationIndex,
+                          'city',
+                          event.target.value,
+                        );
+                        clearFieldError(cityKey);
+                      }}
+                      placeholder={DEFAULT_CITY}
+                      className={cn(
+                        addCompanyInputClassName,
+                        fieldErrorClassName(cityError),
                       )}
                     />
                   </FormField>
