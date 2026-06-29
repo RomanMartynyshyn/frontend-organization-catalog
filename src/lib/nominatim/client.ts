@@ -5,6 +5,10 @@ import {
   NOMINATIM_SEARCH_LIMIT,
 } from '@/lib/nominatim/constants';
 import { enrichGeocodeSuggestions } from '@/lib/geocode/enrichGeocodeSuggestions';
+import {
+  buildGeocodeLabel,
+  buildGeocodeStreetLine,
+} from '@/lib/geocode/formatGeocodeAddress';
 import type {
   GeocodeSuggestion,
   NominatimSearchResult,
@@ -36,26 +40,6 @@ function getUserAgent(): string {
   return `${APP_NAME}/1.0 (${SERVER_URL})`;
 }
 
-function buildStreetLine(address: NominatimSearchResult['address'], fallback: string): string {
-  const road =
-    address?.road?.trim() ||
-    address?.pedestrian?.trim() ||
-    address?.footway?.trim() ||
-    '';
-
-  const houseNumber = address?.house_number?.trim() || '';
-
-  if (road && houseNumber) {
-    return `${road}, ${houseNumber}`;
-  }
-
-  if (road) {
-    return road;
-  }
-
-  return fallback;
-}
-
 function mapNominatimResult(result: NominatimSearchResult): GeocodeSuggestion | null {
   const latitude = Number(result.lat);
   const longitude = Number(result.lon);
@@ -64,14 +48,14 @@ function mapNominatimResult(result: NominatimSearchResult): GeocodeSuggestion | 
     return null;
   }
 
-  const street = buildStreetLine(
-    result.address,
-    result.display_name.split(',')[0]?.trim() || result.display_name,
-  );
+  const fallback =
+    result.display_name.split(',')[0]?.trim() || result.display_name;
+  const street = buildGeocodeStreetLine(result.address, fallback);
+  const label = buildGeocodeLabel(result.address) || result.display_name;
 
   return {
     id: String(result.place_id),
-    label: result.display_name,
+    label,
     street,
     latitude,
     longitude,

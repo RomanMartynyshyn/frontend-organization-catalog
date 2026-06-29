@@ -94,7 +94,7 @@ export function CompanyListCard({ company }: CompanyListCardProps) {
     .map((address) => address.trim())
     .filter(Boolean);
   const displayAddress =
-    company.streetAddress.trim() || company.primaryAddress.trim();
+    company.primaryAddress.trim() || company.streetAddress.trim();
   const extraAddressCount = Math.max(addresses.length - 1, 0);
   const hasMoreAddresses = extraAddressCount > 0;
   const workingHoursLabel = company.workingHours

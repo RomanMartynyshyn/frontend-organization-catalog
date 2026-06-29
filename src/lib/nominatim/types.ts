@@ -3,6 +3,11 @@ export type NominatimAddress = {
   pedestrian?: string;
   footway?: string;
   house_number?: string;
+  building?: string;
+  residential?: string;
+  quarter?: string;
+  shop?: string;
+  amenity?: string;
   city?: string;
   town?: string;
   village?: string;
