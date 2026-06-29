@@ -22,12 +22,11 @@ function stripWebsiteProtocol(url: string): string {
 
 function formatLocation(location: CatalogLocation): string {
   const street = location.street?.trim();
-  const cityLine = [location.city, location.region].filter(Boolean).join(', ');
-  const withPostCode = location.postCode
-    ? `${cityLine} ${location.postCode}`.trim()
-    : cityLine;
+  const city = location.city?.trim();
+  const postCode = location.postCode?.trim();
+  const cityLine = [city, postCode].filter(Boolean).join(', ');
 
-  return [street, withPostCode].filter(Boolean).join(', ');
+  return [street, cityLine].filter(Boolean).join(', ');
 }
 
 function formatCategories(categories: CatalogOrganization['categories']): string {
